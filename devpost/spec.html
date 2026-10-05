@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handful Is Not a Unit: Technical Spec</title>
+<!-- Visual companion to spec.md. The Markdown file is canonical; regenerate this page when it changes. -->
+<style>
+  :root {
+    --bg: #faf6ee; --surface: #fffdf8; --ink: #2b2118; --muted: #6f6254; --line: #e2d7c3;
+    --accent: #b4532a; --accent-soft: #f4dfd0; --now: #2f6b4f; --later: #8a6a12; --cut: #8c3b3b;
+    --blue: #2d5d8c; --blue-soft: #dfe9f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1713; --surface: #26201a; --ink: #f1e8da; --muted: #b3a593; --line: #40362b;
+      --accent: #e58a5c; --accent-soft: #3b2a20; --now: #7fc7a2; --later: #dcbb5e; --cut: #e09090;
+      --blue: #8db8e0; --blue-soft: #22303d;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif; line-height: 1.55; }
+  main { max-width: 880px; margin: 0 auto; padding: 40px 16px 64px; }
+  summary, button, .eyebrow, .status, footer, h3, th, .where { font-family: ui-sans-serif, system-ui, sans-serif; }
+  .eyebrow { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-size: clamp(1.9rem, 6vw, 2.8rem); line-height: 1.1; margin: 8px 0 12px; }
+  h2 { font-size: 1.3rem; margin: 40px 0 10px; }
+  h3 { font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 18px 0 6px; }
+  .lede { font-size: 1.12rem; color: var(--muted); margin: 0; }
+  .status { display: inline-block; margin-top: 16px; padding: 3px 10px; border: 1px solid var(--now); color: var(--now); border-radius: 999px; font-size: 0.8rem; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+  .rule { border-left: 4px solid var(--accent); font-size: 1.1rem; }
+  ul, ol { padding-left: 1.2em; margin: 0; }
+  li { margin-bottom: 6px; }
+  code { font-size: 0.9em; background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
+  .scroll { overflow-x: auto; }
+  svg { width: 100%; min-width: 660px; height: auto; display: block; }
+  svg text { font-family: ui-sans-serif, system-ui, sans-serif; fill: var(--ink); }
+  svg .zone { fill: none; stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 6 5; }
+  svg .zonelabel { font-size: 11px; letter-spacing: 0.1em; fill: var(--muted); }
+  svg .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+  svg .hot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+  svg .ext { fill: var(--blue-soft); stroke: var(--blue); stroke-width: 1.5; }
+  svg .arrow { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+  svg .head { fill: var(--muted); }
+  svg .small { font-size: 11.5px; fill: var(--muted); }
+  svg .label { font-size: 13.5px; font-weight: 600; }
+  figure { margin: 0; }
+  figcaption { color: var(--muted); font-size: 0.9rem; margin-top: 8px; }
+  .stepper { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .stepper button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 7px 16px; font-size: 0.9rem; cursor: pointer; }
+  .stepper button:disabled { opacity: 0.4; cursor: default; }
+  .stepper .count { font-family: ui-sans-serif, system-ui, sans-serif; color: var(--muted); font-size: 0.9rem; }
+  .step h2 { margin-top: 0; }
+  .where { display: inline-block; font-size: 0.75rem; border-radius: 999px; padding: 2px 10px; margin: 0 6px 6px 0; border: 1px solid var(--line); color: var(--muted); }
+  .where.ipad { border-color: var(--accent); color: var(--accent); }
+  .where.out { border-color: var(--blue); color: var(--blue); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; padding: 0 18px; }
+  summary { cursor: pointer; padding: 14px 0; font-weight: 600; }
+  details > *:not(summary) { margin: 0 0 16px; }
+  .ask { border-left: 4px solid var(--accent); }
+  .swatches { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .sw { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.78rem; text-align: center; color: var(--muted); }
+  .sw i { display: block; width: 84px; height: 44px; border-radius: 8px; border: 1px solid var(--line); margin-bottom: 4px; }
+  footer { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Technical spec · proof of concept</div>
+  <h1>Handful Is Not a Unit</h1>
+  <p class="lede">How the app is built: the pieces, where each one lives, and how mom's words travel from the kitchen to the recipe card.</p>
+  <span class="status">Status: approved · 2026-10-05</span>
+
+  <h2>The one rule</h2>
+  <div class="card rule"><strong>The AI reads, the app measures.</strong> Gemini only reports "mom said a handful of flour". The amount for "a handful" comes from a fixed table inside the app. The same words always give the same estimate, it is always labeled, and the daughter can correct it. When the table has no entry, the app asks a question instead of guessing.</div>
+
+  <h2>The pieces and where they live</h2>
+  <figure class="card">
+    <div class="scroll">
+    <svg viewBox="0 0 820 380" role="img" aria-labelledby="aT aD">
+      <title id="aT">Architecture of Handful</title>
+      <desc id="aD">On the iPad: the ears turn mom's voice into text, the page sends the text to a helper on Vercel, the helper asks Gemini and returns ingredients, the page looks up the measuring table, shows a line, and saves finished recipes and photos in the recipe box on the iPad. The secret key lives only on Vercel.</desc>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker>
+      </defs>
+
+      <rect class="zone" x="8" y="20" width="470" height="350" rx="14"/>
+      <text class="zonelabel" x="22" y="42">ON THE IPAD (SAFARI)</text>
+      <rect class="zone" x="500" y="20" width="150" height="350" rx="14"/>
+      <text class="zonelabel" x="514" y="42">ON VERCEL</text>
+      <rect class="zone" x="672" y="20" width="140" height="350" rx="14"/>
+      <text class="zonelabel" x="686" y="42">AT GOOGLE</text>
+
+      <rect class="box" x="24" y="64" width="130" height="66" rx="10"/>
+      <text class="label" x="89" y="90" text-anchor="middle">Mom's voice</text>
+      <text class="small" x="89" y="110" text-anchor="middle">"a handful of flour"</text>
+
+      <rect class="box" x="186" y="64" width="130" height="66" rx="10"/>
+      <text class="label" x="251" y="90" text-anchor="middle">The ears</text>
+      <text class="small" x="251" y="110" text-anchor="middle">voice becomes text</text>
+
+      <rect class="hot" x="330" y="150" width="136" height="76" rx="10"/>
+      <text class="label" x="398" y="180" text-anchor="middle">The page</text>
+      <text class="small" x="398" y="200" text-anchor="middle">holds the session</text>
+
+      <rect class="box" x="24" y="160" width="130" height="56" rx="10"/>
+      <text class="label" x="89" y="184" text-anchor="middle">Type or paste</text>
+      <text class="small" x="89" y="202" text-anchor="middle">always available</text>
+
+      <rect class="hot" x="186" y="264" width="130" height="76" rx="10"/>
+      <text class="label" x="251" y="292" text-anchor="middle">Measuring table</text>
+      <text class="small" x="251" y="311" text-anchor="middle">handful: ¼ cup</text>
+      <text class="small" x="251" y="327" text-anchor="middle">fixed, tested, no AI</text>
+
+      <rect class="box" x="24" y="264" width="130" height="76" rx="10"/>
+      <text class="label" x="89" y="292" text-anchor="middle">Recipe box</text>
+      <text class="small" x="89" y="311" text-anchor="middle">recipes and photos</text>
+      <text class="small" x="89" y="327" text-anchor="middle">stay on this iPad</text>
+
+      <rect class="ext" x="512" y="150" width="126" height="76" rx="10"/>
+      <text class="label" x="575" y="178" text-anchor="middle">The helper</text>
+      <text class="small" x="575" y="197" text-anchor="middle">keeps the key secret</text>
+      <text class="small" x="575" y="213" text-anchor="middle">/api/understand</text>
+
+      <rect class="ext" x="684" y="150" width="116" height="76" rx="10"/>
+      <text class="label" x="742" y="180" text-anchor="middle">Gemini</text>
+      <text class="small" x="742" y="200" text-anchor="middle">reads the text</text>
+
+      <path class="arrow" d="M154 97 H184" marker-end="url(#ah)"/>
+      <path class="arrow" d="M316 97 H398 V148" marker-end="url(#ah)"/>
+      <path class="arrow" d="M154 188 H328" marker-end="url(#ah)"/>
+      <path class="arrow" d="M466 176 H510" marker-end="url(#ah)"/>
+      <path class="arrow" d="M510 204 H468" marker-end="url(#ah)"/>
+      <path class="arrow" d="M638 176 H682" marker-end="url(#ah)"/>
+      <path class="arrow" d="M682 204 H640" marker-end="url(#ah)"/>
+      <path class="arrow" d="M370 226 V302 H318" marker-end="url(#ah)"/>
+      <path class="arrow" d="M420 226 V356 H89 V342" stroke-dasharray="5 5" marker-end="url(#ah)"/>
+      <text class="small" x="488" y="168" text-anchor="middle">text</text>
+      <text class="small" x="660" y="168" text-anchor="middle">text</text>
+      <text class="small" x="300" y="372">on Finish: save</text>
+      <text class="small" x="575" y="258" text-anchor="middle">the key lives here</text>
+      <text class="small" x="575" y="274" text-anchor="middle">and nowhere else</text>
+    </svg>
+    </div>
+    <figcaption>Only text leaves the iPad for Google. Photos and finished recipes never leave the iPad. Orange boxes are the heart of the build.</figcaption>
+  </figure>
+
+  <h2>One sentence, step by step</h2>
+  <div class="stepper" id="stepper" hidden>
+    <button id="prev">Back</button>
+    <span class="count" id="count"></span>
+    <button id="next">Next</button>
+  </div>
+
+  <section class="card step">
+    <h2>1 · The daughter starts a recipe</h2>
+    <span class="where ipad">iPad</span>
+    <p>She opens the page, which reads the recipe box and shows saved recipes and <strong>New</strong>. She types the dish name and starts listening. Safari asks permission for the microphone the first time.</p>
+    <h3>Files</h3><p><code>app/page.tsx</code> · <code>app/new/page.tsx</code> · <code>lib/recipeBox.ts</code></p>
+    <h3>From the PRD</h3><p>Recipe list · Naming the recipe</p>
+  </section>
+  <section class="card step">
+    <h2>2 · Mom says "a handful of flour"</h2>
+    <span class="where ipad">iPad</span>
+    <p>The iPad's built-in speech recognition turns her voice into text. If it stops by itself, it is restarted. If it cannot be used at all, the type-or-paste box does the same job.</p>
+    <h3>Files</h3><p><code>lib/ears.ts</code> · <code>components/ListeningSign.tsx</code> · <code>components/TypeOrPasteBox.tsx</code></p>
+    <h3>From the PRD</h3><p>Listening and ingredient lines · States and Boundaries</p>
+  </section>
+  <section class="card step">
+    <h2>3 · The text goes to the helper, and on to Gemini</h2>
+    <span class="where ipad">iPad</span><span class="where out">Vercel</span><span class="where out">Google</span>
+    <p>The page sends the new text and the names of ingredients already listed. The helper adds the instructions and the secret key and asks Gemini. Gemini answers in a fixed format: ingredient "flour", mom's words "a handful", kind "rough", rough word "handful", food group "grain".</p>
+    <h3>Files</h3><p><code>lib/understandingClient.ts</code> · <code>app/api/understand/route.ts</code> · <code>lib/server/gemini.ts</code> · <code>lib/server/instructions.ts</code></p>
+    <h3>From the PRD</h3><p>Listening and ingredient lines · Questions from the app</p>
+  </section>
+  <section class="card step">
+    <h2>4 · The app measures</h2>
+    <span class="where ipad">iPad</span>
+    <p>The page looks "handful" up in the fixed table and gets ¼ cup. A line appears: flour, its picture, "a handful", "about ¼ cup", labeled estimate. A word the table does not know becomes a question.</p>
+    <h3>Files</h3><p><code>lib/measuringTable.ts</code> · <code>lib/sessionRules.ts</code> · <code>lib/lineDisplay.ts</code> · <code>components/IngredientLine.tsx</code> · <code>components/IngredientPicture.tsx</code></p>
+    <h3>From the PRD</h3><p>Listening and ingredient lines</p>
+  </section>
+  <section class="card step">
+    <h2>5 · The daughter confirms, changes, or snaps</h2>
+    <span class="where ipad">iPad</span>
+    <p>One tap confirms. Tapping the amount shows a few smaller and larger amounts to pick from. The camera button opens the iPad camera and attaches the photo to the line.</p>
+    <h3>Files</h3><p><code>components/AmountPicker.tsx</code> · <code>components/PhotoButton.tsx</code> · <code>lib/photo.ts</code> · <code>components/QuestionCard.tsx</code></p>
+    <h3>From the PRD</h3><p>Confirming or changing an amount · Photos · Questions from the app</p>
+  </section>
+  <section class="card step">
+    <h2>6 · Finish: leftovers, meal photo, card</h2>
+    <span class="where ipad">iPad</span>
+    <p>After <strong>Finish</strong>, the page walks through unanswered questions and unconfirmed estimates, asks for the finished meal photo, saves the recipe into the recipe box, and shows the card.</p>
+    <h3>Files</h3><p><code>app/session/page.tsx</code> · <code>app/recipe/[id]/page.tsx</code> · <code>components/RecipeCard.tsx</code> · <code>lib/recipeBox.ts</code></p>
+    <h3>From the PRD</h3><p>Questions from the app · The recipe card · Recipe list</p>
+  </section>
+
+  <h2>What it is built with</h2>
+  <div class="card scroll">
+    <table>
+      <tr><th>Piece</th><th>Choice</th><th>Why</th></tr>
+      <tr><td>Language</td><td>TypeScript</td><td>Catches many mistakes before the app runs.</td></tr>
+      <tr><td>Framework</td><td>Next.js</td><td>One project holds the page and the helper; Vercel hosts it without extra setup.</td></tr>
+      <tr><td>Speech to text</td><td>Built into Safari</td><td>Your decision: no extra account or key.</td></tr>
+      <tr><td>Understanding</td><td>Gemini, <code>gemini-3.8-flash</code></td><td>One service that reads text now and can take audio if the built-in ears fail.</td></tr>
+      <tr><td>Saving</td><td>Browser storage on the iPad</td><td>No accounts, no database, photos stay on the device.</td></tr>
+      <tr><td>Checks</td><td>Vitest</td><td>Tests the measuring table and the session rules automatically.</td></tr>
+      <tr><td>Hosting</td><td>Vercel</td><td>Your decision. Gives the secure address the iPad microphone requires.</td></tr>
+    </table>
+  </div>
+
+  <h2>Look and feel</h2>
+  <div class="card">
+    <p style="margin-top:0">A well-loved family recipe card on warm paper, with one color from each kitchen. Mom's own words always appear in a handwriting face and in quotes, so her words and the app's numbers are never confused.</p>
+    <div class="swatches">
+      <div class="sw"><i style="background:#f7f0e1"></i>paper</div>
+      <div class="sw"><i style="background:#c8452f"></i>tomato · Italian</div>
+      <div class="sw"><i style="background:#2f5f9e"></i>Delft blue · Dutch</div>
+      <div class="sw"><i style="background:#d9a521"></i>mustard · German</div>
+      <div class="sw"><i style="background:#5f8f4e"></i>pandan · Malaysian</div>
+      <div class="sw"><i style="background:#3a2a1e"></i>ink</div>
+    </div>
+    <p style="margin-bottom:0">Lettering: Fraunces for titles, Caveat for mom's words, Nunito for everything read quickly. Large tap targets and large text for busy hands.</p>
+  </div>
+
+  <h2>Where it can break, and what happens instead</h2>
+  <details open>
+    <summary>The built-in ears stop or mishear</summary>
+    <p>The sign shows "not listening", listening restarts by itself, and the type-or-paste box is always there. If the three-times kitchen test fails, the speech service fallback is built, using the same Gemini key.</p>
+  </details>
+  <details>
+    <summary>The microphone is not allowed</summary>
+    <p>A plain message explains how to allow it in Safari. Typing and pasting still work.</p>
+  </details>
+  <details>
+    <summary>Gemini is slow or unreachable</summary>
+    <p>The text is kept and retried once. If it still fails, a small "couldn't understand that, try again" message appears. No line is invented.</p>
+  </details>
+  <details>
+    <summary>A rough word the table does not know</summary>
+    <p>A question, never a guess.</p>
+  </details>
+  <details>
+    <summary>Photos fill the iPad's storage</summary>
+    <p>Photos are shrunk before saving. If one cannot be saved, the recipe is saved without it and the daughter is told.</p>
+  </details>
+
+  <h2>Agreed at review: the recommendations</h2>
+  <div class="card ask">
+    <ul>
+      <li><strong>Gemini as the one AI service.</strong> You have both a Claude API account and a Gemini key. Gemini can also take audio, so the speech fallback needs no second service. Tradeoff: mom's words go to Google.</li>
+      <li><strong>The paid Gemini tier.</strong> On the free tier, what is sent may be used to improve Google's products. With a child in the kitchen, paid is the safer choice. A recipe should cost well under a dollar.</li>
+      <li><strong>Next.js and TypeScript</strong> as the way the app is built.</li>
+      <li><strong>The fixed measuring table.</strong></li>
+      <li><strong>Drawn food-group icons</strong> as the ingredient pictures.</li>
+    </ul>
+  </div>
+
+  <h2>Open issue</h2>
+  <div class="card">The Vercel address is public. Anyone who finds it could use the helper until the spending cap stops them. Vercel can require a Vercel sign-in to open the page, at no cost and with no code. This can wait until the first deploy.</div>
+
+  <footer>Visual companion to <code>devpost/spec.md</code>, which remains the canonical document and also holds the full file structure, data model and exact service calls.</footer>
+</main>
+<script>
+  // Journey stepper: one step at a time. Without JavaScript all six steps stay visible.
+  (function () {
+    var steps = document.querySelectorAll('.step');
+    var prev = document.getElementById('prev');
+    var next = document.getElementById('next');
+    var count = document.getElementById('count');
+    var current = 0;
+    function show(index) {
+      current = index;
+      steps.forEach(function (step, i) { step.hidden = i !== index; });
+      prev.disabled = index === 0;
+      next.disabled = index === steps.length - 1;
+      count.textContent = 'Step ' + (index + 1) + ' of ' + steps.length;
+    }
+    prev.addEventListener('click', function () { show(current - 1); });
+    next.addEventListener('click', function () { show(current + 1); });
+    document.getElementById('stepper').hidden = false;
+    show(0);
+  })();
+</script>
+</body>
+</html>

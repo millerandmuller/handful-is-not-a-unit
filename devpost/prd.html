@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handful Is Not a Unit: Product Requirements</title>
+<!-- Visual companion to prd.md. The Markdown file is canonical; regenerate this page when it changes. -->
+<style>
+  :root {
+    --bg: #faf6ee; --surface: #fffdf8; --ink: #2b2118; --muted: #6f6254; --line: #e2d7c3;
+    --accent: #b4532a; --accent-soft: #f4dfd0; --now: #2f6b4f; --later: #8a6a12; --cut: #8c3b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1713; --surface: #26201a; --ink: #f1e8da; --muted: #b3a593; --line: #40362b;
+      --accent: #e58a5c; --accent-soft: #3b2a20; --now: #7fc7a2; --later: #dcbb5e; --cut: #e09090;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif; line-height: 1.55; }
+  main { max-width: 860px; margin: 0 auto; padding: 40px 16px 64px; }
+  .sans, summary, button, .eyebrow, .status, footer, h3 { font-family: ui-sans-serif, system-ui, sans-serif; }
+  .eyebrow { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-size: clamp(1.9rem, 6vw, 2.8rem); line-height: 1.1; margin: 8px 0 12px; }
+  h2 { font-size: 1.3rem; margin: 40px 0 10px; }
+  h3 { font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 18px 0 6px; }
+  .lede { font-size: 1.12rem; color: var(--muted); margin: 0; }
+  .status { display: inline-block; margin-top: 16px; padding: 3px 10px; border: 1px solid var(--now); color: var(--now); border-radius: 999px; font-size: 0.8rem; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+  blockquote { margin: 0; padding: 14px 18px; background: var(--accent-soft); border-radius: 10px; font-style: italic; }
+  ul { padding-left: 1.2em; margin: 0; }
+  li { margin-bottom: 6px; }
+  .scroll { overflow-x: auto; }
+  svg { width: 100%; min-width: 640px; height: auto; display: block; }
+  svg text { font-family: ui-sans-serif, system-ui, sans-serif; fill: var(--ink); }
+  svg .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+  svg .hot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+  svg .arrow { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+  svg .head { fill: var(--muted); }
+  svg .small { font-size: 11.5px; fill: var(--muted); }
+  svg .label { font-size: 13.5px; font-weight: 600; }
+  figure { margin: 0; }
+  figcaption { color: var(--muted); font-size: 0.9rem; margin-top: 8px; }
+  .steps { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .steps button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 7px 14px; font-size: 0.9rem; cursor: pointer; }
+  .steps button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .panel h2 { margin-top: 0; }
+  .criteria li { list-style: "☐  "; }
+  .mock { border: 1px dashed var(--line); border-radius: 10px; padding: 12px 14px; margin-top: 6px; }
+  .line { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
+  .said { font-style: italic; color: var(--muted); }
+  .tag { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.72rem; border: 1px solid var(--later); color: var(--later); border-radius: 999px; padding: 1px 8px; }
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; padding: 0 18px; }
+  summary { cursor: pointer; padding: 14px 0; font-weight: 600; }
+  details > ul, details > p { margin: 0 0 16px; }
+  .now summary { color: var(--now); } .later summary { color: var(--later); } .cut summary { color: var(--cut); }
+  .reason { color: var(--muted); }
+  .ask { border-left: 4px solid var(--accent); }
+  footer { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Product requirements · proof of concept</div>
+  <h1>Handful Is Not a Unit</h1>
+  <p class="lede">An iPad app that listens while mom talks through a family recipe and turns her rough amounts into a recipe card her 10-year-old daughter can cook from later.</p>
+  <span class="status">Status: approved · 2026-10-04</span>
+
+  <h2>The journey</h2>
+  <figure class="card">
+    <div class="scroll">
+    <svg viewBox="0 0 800 250" role="img" aria-labelledby="jT jD">
+      <title id="jT">The daughter's journey through Handful</title>
+      <desc id="jD">Recipe list, then name the recipe, then the listening session where ingredient lines appear and are confirmed and questions are asked, then leftover questions and the finished meal photo, then the recipe card, which is saved back to the recipe list.</desc>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker>
+      </defs>
+      <rect class="box" x="8" y="30" width="130" height="76" rx="10"/>
+      <text class="label" x="73" y="60" text-anchor="middle">1 Recipe list</text>
+      <text class="small" x="73" y="80" text-anchor="middle">saved recipes, New</text>
+
+      <rect class="box" x="170" y="30" width="130" height="76" rx="10"/>
+      <text class="label" x="235" y="60" text-anchor="middle">2 Name it</text>
+      <text class="small" x="235" y="80" text-anchor="middle">the dish name</text>
+
+      <rect class="hot" x="332" y="30" width="150" height="76" rx="10"/>
+      <text class="label" x="407" y="56" text-anchor="middle">3 Listening</text>
+      <text class="small" x="407" y="74" text-anchor="middle">mom talks, lines appear</text>
+      <text class="small" x="407" y="90" text-anchor="middle">confirm, change, snap</text>
+
+      <rect class="box" x="514" y="30" width="130" height="76" rx="10"/>
+      <text class="label" x="579" y="56" text-anchor="middle">4 Leftovers</text>
+      <text class="small" x="579" y="74" text-anchor="middle">queued questions</text>
+      <text class="small" x="579" y="90" text-anchor="middle">finished meal photo</text>
+
+      <rect class="hot" x="676" y="30" width="116" height="76" rx="10"/>
+      <text class="label" x="734" y="60" text-anchor="middle">5 Recipe card</text>
+      <text class="small" x="734" y="80" text-anchor="middle">all measurements</text>
+
+      <path class="arrow" d="M138 68 H168" marker-end="url(#ah)"/>
+      <path class="arrow" d="M300 68 H330" marker-end="url(#ah)"/>
+      <path class="arrow" d="M482 68 H512" marker-end="url(#ah)"/>
+      <path class="arrow" d="M644 68 H674" marker-end="url(#ah)"/>
+
+      <rect class="box" x="332" y="150" width="150" height="60" rx="10"/>
+      <text class="label" x="407" y="176" text-anchor="middle">App is unsure</text>
+      <text class="small" x="407" y="194" text-anchor="middle">asks a question</text>
+      <path class="arrow" d="M380 106 V148" marker-end="url(#ah)"/>
+      <path class="arrow" d="M434 150 V108" marker-end="url(#ah)"/>
+      <text class="small" x="372" y="132" text-anchor="end">unsure</text>
+      <text class="small" x="442" y="132">answered</text>
+      <path class="arrow" d="M482 180 H579 V108" stroke-dasharray="5 5" marker-end="url(#ah)"/>
+      <text class="small" x="588" y="176">not answered: queued</text>
+
+      <path class="arrow" d="M734 106 V235 H73 V108" stroke-dasharray="5 5" marker-end="url(#ah)"/>
+      <text class="small" x="200" y="228">saved on this iPad, appears in the list</text>
+    </svg>
+    </div>
+    <figcaption>Highlighted: the listening session, where the idea is proven, and the card, which is the result.</figcaption>
+  </figure>
+
+  <h2>Screen by screen</h2>
+  <div class="steps" role="tablist" aria-label="Screens" id="tabs" hidden>
+    <button role="tab" data-i="0">1 Recipe list</button>
+    <button role="tab" data-i="1">2 Name it</button>
+    <button role="tab" data-i="2">3 Listening</button>
+    <button role="tab" data-i="3">4 Leftovers</button>
+    <button role="tab" data-i="4">5 Recipe card</button>
+  </div>
+
+  <section class="card panel">
+    <h2>1 · Recipe list</h2>
+    <p>The recipes captured on this iPad, each shown by name, and a <strong>New</strong> button. Tapping a recipe opens its card.</p>
+    <h3>If things are different</h3>
+    <ul><li><strong>First use:</strong> the list is empty. The screen says so in a friendly way and points to New.</li></ul>
+    <h3>How we know it works</h3>
+    <ul class="criteria">
+      <li>After finishing a recipe and reopening the app, that recipe is in the list.</li>
+      <li>Tapping it shows the same card that was shown at the end of the session.</li>
+    </ul>
+    <p class="reason">First to be dropped if time runs short: a demo shows one recipe.</p>
+  </section>
+
+  <section class="card panel">
+    <h2>2 · Name the recipe</h2>
+    <p>One input for the dish name, and a way to begin. The name becomes the title of the card.</p>
+    <h3>How we know it works</h3>
+    <ul class="criteria">
+      <li>The name typed at the start is the title on the finished card.</li>
+      <li>A session cannot start with an empty name.</li>
+    </ul>
+  </section>
+
+  <section class="card panel">
+    <h2>3 · Listening session</h2>
+    <p>A clear sign that the iPad is listening, the growing list of ingredient lines, any question the app is asking right now, and a way to finish.</p>
+    <div class="mock" aria-label="Example ingredient lines">
+      <div class="line"><strong>Flour</strong> <span class="said">"a handful"</span> <span>about ¼ cup</span> <span class="tag">estimate</span></div>
+      <div class="line"><strong>Eggs</strong> <span class="said">"two eggs"</span> <span>2</span></div>
+    </div>
+    <h3>What happens</h3>
+    <ul>
+      <li>A rough amount is converted to a standard kitchen measurement and marked as an estimate.</li>
+      <li>An exact amount appears as said, with no estimate mark.</li>
+      <li>What mom says about how to cook is kept as steps, in order, in her own words.</li>
+      <li>Kitchen talk that is not part of the recipe does not become a line.</li>
+      <li>One tap confirms an estimate. Tapping the amount offers nearby amounts, less and more. Any line can be removed.</li>
+      <li>Each line has a button to snap a photo of mom adding the ingredient. Photos are optional.</li>
+      <li>When the app is unsure, it asks a question instead of guessing. Unanswered questions go to the queue.</li>
+    </ul>
+    <h3>If things are different</h3>
+    <ul>
+      <li><strong>Nothing heard yet:</strong> shows it is listening and invites mom to start talking.</li>
+      <li><strong>Not allowed to listen:</strong> explains that it needs to hear mom and how to allow it.</li>
+      <li><strong>Cannot understand:</strong> says so on screen and does not invent lines.</li>
+      <li><strong>Camera not allowed:</strong> photos are skipped; everything else works.</li>
+    </ul>
+    <h3>How we know it works</h3>
+    <ul class="criteria">
+      <li>"A handful of flour" produces a line with flour, its picture, the words "a handful", and an estimated amount.</li>
+      <li>"Two eggs" produces a line showing 2 eggs with no estimate mark.</li>
+      <li>Something unrelated to the recipe produces no line.</li>
+      <li>Lines appear while mom is still cooking, not only at the end.</li>
+      <li>One tap confirms an estimate and the mark disappears.</li>
+      <li>Changing "about ¼ cup" to "½ cup" updates the line and the finished card.</li>
+      <li>An ingredient said without an amount produces a question, not an invented amount.</li>
+      <li>A snapped photo appears on its ingredient line.</li>
+    </ul>
+  </section>
+
+  <section class="card panel">
+    <h2>4 · Leftover questions</h2>
+    <p>After the daughter finishes the session: the queued questions, one at a time, then the prompt to take a picture of the finished meal.</p>
+    <h3>What happens</h3>
+    <ul>
+      <li>Questions ignored during cooking are shown again.</li>
+      <li>Estimates she neither confirmed nor changed are shown again.</li>
+      <li>She can change any answer.</li>
+    </ul>
+    <h3>If things are different</h3>
+    <ul><li><strong>Nothing captured:</strong> the app says there is nothing to make a card from and lets her keep listening or leave.</li></ul>
+    <h3>How we know it works</h3>
+    <ul class="criteria">
+      <li>A question ignored during cooking is shown again after finishing.</li>
+      <li>An estimate that was never confirmed is shown again after finishing.</li>
+      <li>Skipping all photos still produces a complete card.</li>
+    </ul>
+  </section>
+
+  <section class="card panel">
+    <h2>5 · Recipe card</h2>
+    <p>The dish name, the finished meal image, every ingredient with its measurement, and the steps in order. Mom's original words stay visible next to each converted amount. At the foot of the card is a short note: &quot;The amounts on this card are estimates. Mom's own words are the real recipe. This card is not food-safety advice.&quot;</p>
+    <h3>How we know it works</h3>
+    <ul class="criteria">
+      <li>Every ingredient on the card has a measurement.</li>
+      <li>No line is still marked as an unreviewed estimate.</li>
+      <li>The finished meal image appears at the top of the card.</li>
+      <li>A person who was not in the kitchen can read it top to bottom and know what to add, how much, and what to do.</li>
+    </ul>
+  </section>
+
+  <h2>Look and feel</h2>
+  <blockquote>"homemade, mom to daughter, carefully passed on, beautifully designed; think italian, german, dutch, malaysian mixed cooking, all passed onto a smart 10-year old daughter"</blockquote>
+
+  <h2>From scope to product</h2>
+  <div class="card">
+    <ul>
+      <li>Scope said "the app tracks it". Now: a line with the ingredient, its picture, mom's words, and the converted amount.</li>
+      <li>Scope said the daughter "confirms". Now: one tap to confirm, tap the amount to change it, and unconfirmed estimates come back at the end.</li>
+      <li>New since scope: a recipe list, keepsake photos, and questions from the app with a queue.</li>
+    </ul>
+  </div>
+
+  <h2>Confirmed at review: the agent's proposals</h2>
+  <div class="card ask">
+    <ul>
+      <li>Confirm and change works by one tap to confirm, and tapping the amount to pick a nearby amount.</li>
+      <li>If time runs short, the recipe list is dropped first and the photos second.</li>
+      <li>The finished meal image is a photo the daughter takes, not a generated picture.</li>
+      <li>The dish name is typed.</li>
+      <li>Amounts are shown in cups and spoons, not grams.</li>
+      <li>Questions appear on screen and are not read aloud.</li>
+      <li>A session closed before finishing is not kept.</li>
+    </ul>
+  </div>
+
+  <h2>What is in, and what is not</h2>
+  <details class="now" open>
+    <summary>What we're building (8)</summary>
+    <ul>
+      <li>A recipe list with New.</li>
+      <li>Naming a recipe.</li>
+      <li>A listening session that produces ingredient lines and steps from mom's speech.</li>
+      <li>Conversion of rough amounts into estimated standard measurements, next to mom's words.</li>
+      <li>Confirm, change and remove for each line.</li>
+      <li>Questions when the app is unsure, with a queue reviewed at the end.</li>
+      <li>A picture per ingredient, an optional snapped photo, and a finished meal image.</li>
+      <li>The finished recipe card.</li>
+    </ul>
+  </details>
+  <details class="later">
+    <summary>Deferred from the proof of concept (5)</summary>
+    <ul>
+      <li><strong>Mom sharing recipes from her own device.</strong> <span class="reason">Needs accounts and syncing between devices.</span></li>
+      <li><strong>The app capturing photos by itself.</strong> <span class="reason">Hard to get right; the daughter snaps instead.</span></li>
+      <li><strong>Measuring by camera.</strong> <span class="reason">A camera cannot reliably tell how much is in a hand.</span></li>
+      <li><strong>Printing or sharing the card.</strong> <span class="reason">Not needed to prove the idea.</span></li>
+      <li><strong>Editing a finished recipe later.</strong> <span class="reason">The card is fixed once the session is finished.</span></li>
+    </ul>
+  </details>
+  <details class="cut">
+    <summary>Non-goals (4)</summary>
+    <ul>
+      <li><strong>No accounts or logins.</strong> <span class="reason">One kitchen, one iPad.</span></li>
+      <li><strong>No measuring from video.</strong> <span class="reason">A confident wrong number would break the "cook it and get the same thing" test.</span></li>
+      <li><strong>No recipe search, website import, or meal planning.</strong> <span class="reason">This captures one family's spoken recipes.</span></li>
+      <li><strong>No nutrition or allergen information.</strong> <span class="reason">Outside the core idea.</span></li>
+    </ul>
+  </details>
+
+  <footer>Visual companion to <code>devpost/prd.md</code>, which remains the canonical document.</footer>
+</main>
+<script>
+  // Step controls: show one screen at a time. Without JavaScript all five panels stay visible.
+  (function () {
+    var tabs = document.getElementById('tabs');
+    var buttons = tabs.querySelectorAll('button');
+    var panels = document.querySelectorAll('.panel');
+    function show(index) {
+      panels.forEach(function (panel, i) { panel.hidden = i !== index; });
+      buttons.forEach(function (button, i) { button.setAttribute('aria-selected', String(i === index)); });
+    }
+    buttons.forEach(function (button) {
+      button.addEventListener('click', function () { show(Number(button.dataset.i)); });
+    });
+    tabs.hidden = false;
+    show(2);
+  })();
+</script>
+</body>
+</html>

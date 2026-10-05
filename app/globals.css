@@ -1,0 +1,356 @@
+/* The look: a well-loved family recipe card on warm paper.
+   One color from each kitchen, on dark brown ink. */
+
+:root {
+  --paper: #f6efe0;
+  --card: #efe4cd;
+  --card-edge: #dfd0b1;
+  --ink: #3a2a1f;
+  --ink-soft: #6b584a;
+
+  --tomato: #b93a26; /* Italian: estimates and questions */
+  --tomato-wash: #f6dcd3;
+  --delft: #1f4e8c; /* Dutch: the main action color */
+  --delft-deep: #173b6b;
+  --mustard: #c9961a; /* German */
+  --pandan: #4f7f45; /* Malaysian */
+
+  --tap: 56px; /* the smallest thing a busy hand has to hit */
+  --radius: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(201, 150, 26, 0.08), transparent 42%),
+    radial-gradient(circle at 88% 92%, rgba(31, 78, 140, 0.06), transparent 45%);
+  background-attachment: fixed;
+  font-family: var(--font-read), system-ui, sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.45;
+}
+
+h1,
+h2 {
+  font-family: var(--font-title), Georgia, serif;
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0;
+}
+
+button,
+textarea,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--delft);
+  outline-offset: 3px;
+}
+
+/* Mom's own words: always handwriting, always in quotes. */
+.moms-words {
+  font-family: var(--font-hand), cursive;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.moms-words::before {
+  content: "\201C";
+}
+.moms-words::after {
+  content: "\201D";
+}
+
+.button {
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 0 1.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--delft);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+.button:hover {
+  background: var(--delft-deep);
+}
+.button:disabled {
+  background: var(--card-edge);
+  color: var(--ink-soft);
+  cursor: not-allowed;
+}
+.button--quiet {
+  background: transparent;
+  color: var(--delft);
+  box-shadow: inset 0 0 0 2px var(--delft);
+}
+.button--quiet:hover {
+  background: rgba(31, 78, 140, 0.08);
+}
+
+/* ---- Session screen ---- */
+
+.session {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.session__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.session__mark {
+  font-family: var(--font-title), Georgia, serif;
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--delft);
+}
+.session__title {
+  font-size: 2.5rem;
+}
+
+.section__title {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+.section__title::after {
+  content: "";
+  flex: 1;
+  border-bottom: 2px dotted var(--card-edge);
+}
+
+.empty {
+  margin: 0;
+  padding: 1.5rem;
+  border: 2px dashed var(--card-edge);
+  border-radius: var(--radius);
+  color: var(--ink-soft);
+}
+.empty .moms-words {
+  color: var(--ink-soft);
+}
+
+.lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 0 rgba(58, 42, 31, 0.06);
+}
+.line--new {
+  animation: land 0.45s ease-out;
+}
+@keyframes land {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .line--new {
+    animation: none;
+  }
+}
+
+.tile {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-title), Georgia, serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+}
+.tile--delft {
+  background: var(--delft);
+}
+.tile--tomato {
+  background: var(--tomato);
+}
+.tile--mustard {
+  background: var(--mustard);
+}
+.tile--pandan {
+  background: var(--pandan);
+}
+
+.line__what {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.line__name {
+  font-size: 1.6rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.line__amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  text-align: right;
+}
+.line__number {
+  font-size: 1.7rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.line__number--unknown {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  white-space: normal;
+}
+
+.label {
+  display: inline-block;
+  padding: 0.1rem 0.7rem;
+  border-radius: 999px;
+  background: var(--tomato-wash);
+  color: var(--tomato);
+  border: 1.5px solid var(--tomato);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.steps {
+  margin: 0;
+  padding-left: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.steps li::marker {
+  font-family: var(--font-title), Georgia, serif;
+  color: var(--delft);
+  font-weight: 600;
+}
+
+.status {
+  margin: 0;
+  min-height: 1.8rem;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.notice {
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius);
+  background: var(--tomato-wash);
+  border: 1.5px solid var(--tomato);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.notice p {
+  margin: 0;
+}
+.notice__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* ---- Type-or-paste box ---- */
+
+.typebox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.typebox__label {
+  font-weight: 800;
+}
+.typebox__row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+.typebox__text {
+  flex: 1;
+  min-height: calc(var(--tap) * 1.6);
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--card-edge);
+  border-radius: var(--radius);
+  background: #fffaf0;
+  resize: vertical;
+}
+.typebox__text:focus-visible {
+  border-color: var(--delft);
+  outline-offset: 0;
+}
+.typebox__hint {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+.typebox__hint--full {
+  color: var(--tomato);
+  font-weight: 800;
+}
+
+@media (max-width: 560px) {
+  .line {
+    grid-template-columns: auto 1fr;
+  }
+  .line__amount {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    text-align: left;
+  }
+  .typebox__row {
+    flex-direction: column;
+  }
+}

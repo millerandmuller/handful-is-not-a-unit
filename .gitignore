@@ -1,0 +1,17 @@
+/devpost/learner-profile.md
+.env
+.env.*
+!.env.example
+
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+.vercel
+
+# Local agent tooling and working notes, not part of the app
+.claude/
+.agents/
+agent/
+skills-lock.json
+DECISION_LOG.md

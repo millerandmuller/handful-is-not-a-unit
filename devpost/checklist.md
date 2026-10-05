@@ -1,0 +1,109 @@
+---
+doc: checklist
+status: approved
+---
+
+# Build Checklist
+
+Build mode: learn for slices 1 to 4, then fast for the three extras (slices 5 to 7), chosen by the learner on 2026-10-05
+
+## Slices
+
+- [x] **1. Type "a handful of flour" and see mom's words next to a real amount**
+  Becomes usable: A running app with a session screen. Text typed or pasted into the box turns into ingredient lines: the ingredient, mom's words in handwriting, and the amount. "A handful of flour" shows "about ¼ cup" marked as an estimate; "two eggs" shows 2 eggs with no estimate mark; cooking instructions appear as steps; unrelated kitchen talk produces nothing.
+  Why now: This is the unique kernel and the memorable beat of the demo, so it comes first. It also proves the whole path once (page, helper on the server, Gemini, measuring table), and it is the path the ears feed into in slice 2. Project setup is part of this slice, not a step of its own.
+  PRD ref: `prd.md > Listening and ingredient lines`, `prd.md > The Core Journey` (step 4)
+  Spec ref: `spec.md > Stack`, `spec.md > File Structure`, `spec.md > Components` (Session screen, Type-or-paste box, Understanding client, Helper on the server, Measuring table, Ingredient line), `spec.md > External Services and Dependencies`, `spec.md > Look and Feel`, `spec.md > Important Failure Modes` (Gemini slow or unusable; unknown rough word)
+  Build: Scaffold the Next.js and TypeScript project in this folder, keeping `devpost/`, `DECISION_LOG.md` and `.gitignore`. Add `lib/types.ts`, `lib/measuringTable.ts` (rough words and the amount ladder), `lib/server/instructions.ts`, `lib/server/gemini.ts`, `app/api/understand/route.ts` (2,000 character limit, answer checked before it is returned), `lib/understandingClient.ts` (one request at a time, known ingredients sent along, one retry), `app/layout.tsx` and `app/globals.css` with the paper look, palette and three fonts, `app/session/page.tsx`, `components/TypeOrPasteBox.tsx`, `components/IngredientLine.tsx` (picture shown as a colored letter tile for now). Add `.env.example` and `tests/measuringTable.test.ts`. Add `README.md` with five parts: how AI was used to build this app and that Gemini reads mom's words while it runs; the estimate caveat (amounts from rough words are estimates from a fixed table, labeled as such, and meant to be corrected); where audio and text go and what is stored (audio is not saved by the app, the iPad's speech recognition may process it on Apple's servers, the text goes through the helper to Google's Gemini, nothing is kept on the server, finished recipes and photos stay in the browser's storage on that iPad); how to run it (`npm install`, the key in `.env.local`, `npm run dev`, `npm test`); and the license (MIT). Add a `LICENSE` file with the MIT license, the owner's choice. The README is what `6-ship` publishes with the repository, so it is kept true in later slices. A rough word missing from the table shows the line as needing an answer, never a guessed number.
+  Verify (mechanical): `npm test` passes the measuring table tests. `npm run build` finishes with no errors. With `npm run dev` running, a POST to `/api/understand` with "a handful of flour, then two eggs, mix until it comes together, and what a lovely day outside" returns flour as rough with rough word handful, eggs as exact 2, one step, and nothing for the weather; a 2,001 character text is refused. In the browser, typing the same sentence shows the flour line with "a handful" and "about ¼ cup" labeled estimate, and the eggs line without the label. `README.md` contains all five parts, the run commands in it are the ones just used, and `LICENSE` exists.
+  Learner check: Run `npm run dev`, open `http://localhost:3000/session`, type "a handful of flour and two eggs" into the box and send it. You should see flour with "a handful" in handwriting and "about ¼ cup" marked as an estimate, and 2 eggs with no estimate mark. Say whether the line looks and reads the way you pictured it.
+  Commit: `Turn typed kitchen talk into ingredient lines with estimates`
+
+- [ ] **2. Mom talks and the lines appear by themselves**
+  Becomes usable: A start listening button and a clear listening sign. Spoken phrases go through exactly the same path as typed text, so lines appear while mom is still talking. If listening is not allowed or not available, the screen says so plainly and the box still works. The app is on a Vercel preview address so it can be opened on the iPad.
+  Why now: Whether the iPad's built-in speech recognition holds up in a real kitchen is the one genuine uncertainty in the plan. The owner's decision is to settle it by evidence, three runs in the kitchen, before anything else depends on it. If it fails, the speech service fallback is planned here, while it is still cheap.
+  PRD ref: `prd.md > Listening and ingredient lines`, `prd.md > States and Boundaries` (nothing heard yet; not allowed to listen; cannot understand)
+  Spec ref: `spec.md > Components` (Ears, Session screen), `spec.md > Where It Runs and How Someone Tries It`, `spec.md > Important Failure Modes` (ears stop or mishear; microphone not allowed), `spec.md > Decisions and Open Issues` (the one genuine uncertainty; public address)
+  Build: Add `lib/ears.ts` (start, stop, restart when Safari stops by itself, hand over finished phrases, report not allowed and not available) and `components/ListeningSign.tsx`, and connect them to the session screen. Add a small test for the restart rule using a stand-in recognizer. Ask the owner before deploying, then run `vercel` for a preview address with `GEMINI_API_KEY` set in Vercel's environment settings, and settle the open question of requiring a Vercel sign-in. Update `README.md` with how to open the app on the iPad and with what was found about listening and screen recording.
+  Verify (mechanical): `npm test` passes, including the restart rule. `npm run build` finishes with no errors. In a laptop browser the listening sign switches between listening and not listening, and with speech recognition switched off the "cannot listen" message appears while the box still produces lines. The preview address answers, and a POST to its `/api/understand` returns a correct answer.
+  Learner check: Open the preview address in Safari on the iPad, allow the microphone, tap start, and have mom talk through a few ingredients while really cooking or pretending to. Do this three times. A pass means lines appear for at least most of what was said in each run. In one of the three runs, also start iPad screen recording with the microphone switched on (press and hold the record button in Control Center to find the microphone switch) while the app is listening, then play the recording back: does the app keep producing lines while recording, and can mom's voice be heard in the video? Tell me what happened in each run and in the recording test. If recording stops the listening, the demo video is recorded from the laptop, as the spec already allows.
+  Commit: `Listen to speech and feed it into the session`
+
+- [ ] **3. Confirm an estimate, change it, or remove a line**
+  Becomes usable: Each estimated line has one tap to confirm. Tapping the amount opens a few smaller and larger amounts to pick from. A confirmed or changed line loses its estimate mark. Any line can be removed.
+  Why now: The scope says the estimate alone will not reproduce the dish; the correction step is what makes the card trustworthy. It completes the kernel, and its rules are what the leftover questions in slice 4 are built on.
+  PRD ref: `prd.md > Confirming or changing an amount`
+  Spec ref: `spec.md > Components` (Session rules, Amount picker, Ingredient line), `spec.md > Data Model` (Ingredient line status)
+  Build: Add `lib/sessionRules.ts` with add, confirm, change and remove as pure rules, and move the session screen onto them. Add `components/AmountPicker.tsx` using the ladder from the measuring table. Add `tests/sessionRules.test.ts`. Add `lib/lineDisplay.ts`, one small rule that decides what a line shows (the amount text, whether the estimate label is on, and mom's words), and make `components/IngredientLine.tsx` draw only from it, so the screen cannot show something the rule did not allow. Add `tests/lineDisplay.test.ts` with the named test "an estimate is never shown without its label and mom's own words". (`lib/lineDisplay.ts` was added to `spec.md > Components` as the Line display rule when this plan was approved; it exists so this promise can be tested.)
+  Verify (mechanical): `npm test` passes the session rules tests for confirm, change and remove and the ladder tests for nearby amounts. `npm test` also passes the named test "an estimate is never shown without its label and mom's own words": for every rough word in the measuring table, a line that is still an estimate shows the label and mom's words; a rough amount with no words from mom becomes a line that needs an answer instead of a bare number; the label goes away only when the line is confirmed or changed. In the browser, confirming removes the estimate mark, changing "about ¼ cup" to "½ cup" updates the line, and removing a line takes it off the screen.
+  Learner check: Add "a handful of flour" and "a pinch of salt". Tap confirm on one, tap the amount on the other and pick a different one, then remove a line. Tell me whether the taps feel easy for a 10-year-old with the iPad propped on a counter.
+  Commit: `Confirm, change and remove ingredient lines`
+
+- [ ] **4. Name the dish, answer the app's questions, finish, and read the recipe card**
+  Becomes usable: The whole journey from start to card. Home has a **New** button, the name screen will not continue with an empty name, the session shows a question when an amount is missing or a rough word is unknown, **Finish** walks through unanswered questions and unconfirmed estimates one at a time, and the recipe card shows the name, every ingredient with its amount and mom's words, the steps in order, and a short note that the amounts are estimates, that mom's own words are the real recipe, and that the card is not food-safety guidance. Finishing with nothing captured says so and offers to keep listening or leave.
+  Why now: This is the last piece of the proof of concept boundary in the scope: a finished card someone can cook from. Everything after it is one of the three extras in the owner's cut order.
+  PRD ref: `prd.md > Naming the recipe`, `prd.md > Questions from the app`, `prd.md > The recipe card`, `prd.md > States and Boundaries` (finishing with nothing captured), `prd.md > The Core Journey` (steps 1 to 3 and 6 to 9)
+  Spec ref: `spec.md > Components` (Name screen, Question card, Leftover questions screen, Recipe card screen, Session rules), `spec.md > Data Model` (Question, Recipe), `spec.md > Look and Feel`
+  Build: Add `app/new/page.tsx`, a home page at `app/page.tsx` with **New** and the friendly empty message, `components/QuestionCard.tsx`, the question and leftover rules in `lib/sessionRules.ts` with tests, the leftover questions view in `app/session/page.tsx`, and `components/RecipeCard.tsx` with the thin patterned border and the short note at the foot of the card, in the app's friendly tone: "The amounts on this card are estimates. Mom's own words are the real recipe. This card is not food-safety advice." The note was added to `prd.md > The recipe card` and `spec.md > Components` (Recipe card screen) when this plan was approved. `components/RecipeCard.tsx` draws its ingredients from `lib/lineDisplay.ts` too. The card is shown at the end of the session from the page's memory; saving comes in slice 7.
+  Verify (mechanical): `npm test` passes the tests for adding and answering questions and for working out leftovers (unanswered questions plus unconfirmed estimates). `npm run build` finishes with no errors. In the browser: an empty name cannot continue; "add some salt" produces a question and no invented amount; an ignored question and an unconfirmed estimate both come back after **Finish**; the card shows the typed name as its title, every ingredient with a measurement, no estimate marks, the steps in order, and the short note at the foot of the card with exactly the agreed wording; **Finish** with nothing captured shows the nothing to make a card from message.
+  Learner check: Start from the home page, name a dish, talk or type through a short recipe including one ingredient with no amount, ignore the question, tap **Finish**, answer what comes back, and read the card top to bottom. Could someone who was not in the kitchen cook from it? Read the short note at the foot of the card as well: is the wording right for your family?
+  Commit: `Add naming, questions, finish and the recipe card`
+
+- [ ] **5. Every ingredient gets its own little picture**
+  Becomes usable: Each line and each card entry shows a small drawn icon for its food group (grain, dairy, egg, vegetable, fruit, meat, fish, spice, oil, liquid, sweet, other) in place of the letter tile.
+  Why now: Third and last in the owner's cut order, so it is the first of the three extras to be built. If hours run short, the letter tiles from slice 1 stay.
+  PRD ref: `prd.md > Listening and ingredient lines`, `prd.md > The recipe card`
+  Spec ref: `spec.md > Components` (Ingredient picture), `spec.md > Look and Feel`
+  Build: Add `components/IngredientPicture.tsx` with twelve icons drawn in code in the app's palette, falling back to the letter tile for an unknown group, and use it in the ingredient line and the recipe card.
+  Verify (mechanical): `npm run build` finishes with no errors. A browser check of a session containing one ingredient from each of the twelve groups shows twelve distinct icons, and an unknown group shows the letter tile.
+  Learner check: Type a few very different ingredients (flour, milk, an egg, chili, fish) and look at the pictures. Do they feel homemade and right for your kitchen, or would you change the style?
+  Commit: `Draw food group pictures for ingredients`
+
+- [ ] **6. Snap a photo of mom adding it, and a photo of the finished meal**
+  Becomes usable: A camera button on each line attaches a photo to that line. After the leftover questions the app asks for a photo of the finished meal. Both appear on the card. Skipping every photo still gives a complete card.
+  Why now: Second in the owner's cut order, so it is built after the pictures. Photos carry the family feeling but do not prove the kernel.
+  PRD ref: `prd.md > Photos`, `prd.md > States and Boundaries` (camera not allowed or not used)
+  Spec ref: `spec.md > Components` (Photo button, Leftover questions screen, Recipe card screen), `spec.md > Important Failure Modes` (photos fill storage)
+  Build: Add `lib/photo.ts` (shrink a photo to a sensible size) and `components/PhotoButton.tsx` (the browser's standard photo picker, which opens the camera on the iPad). Attach photos to lines and to the recipe, add the finished meal prompt to the leftover questions view, and show photos on the card.
+  Verify (mechanical): `npm test` passes a test of the shrink size rule. `npm run build` finishes with no errors. In the browser, choosing an image file for a line shows it on that line and on the card, choosing a meal image shows it at the top of the card, and a run with no photos still reaches a complete card.
+  Learner check: On the iPad, tap the camera button on a line and take a photo, finish, and take a photo of the finished meal. Check both are on the card. Then do a quick recipe with no photos and check the card still looks complete.
+  Commit: `Add ingredient photos and the finished meal photo`
+
+- [ ] **7. Finished recipes stay on the iPad and show up in the list**
+  Becomes usable: A finished recipe, with its photos, is saved on this iPad. The home page lists saved recipes by name, and tapping one opens the same card. Closing and reopening Safari keeps them.
+  Why now: First in the owner's cut order, so it is built last. A demo shows one recipe, so the list is the least visible part.
+  PRD ref: `prd.md > Recipe list`, `prd.md > States and Boundaries` (first use; what persists)
+  Spec ref: `spec.md > Components` (Recipe box, Recipe list screen, Recipe card screen), `spec.md > Data Model`, `spec.md > Important Failure Modes` (photos fill storage)
+  Build: Add `lib/recipeBox.ts` using `idb-keyval` (save, list, load). Save on finish; if saving a photo fails, save the recipe without it and say so. Show the list on `app/page.tsx` and add `app/recipe/[id]/page.tsx`. Check the storage part of `README.md` against what was built and correct it if needed.
+  Verify (mechanical): `npm test` and `npm run build` pass. In the browser: finish a recipe, reload the page, and the recipe is in the list; tapping it shows the same name, ingredients, amounts, steps and photos as at the end of the session; with storage cleared, the friendly empty message and **New** are shown.
+  Learner check: Finish a recipe on the iPad, close Safari completely, open the address again, and tap the recipe in the list. Is it the same card you saw at the end?
+  Commit: `Save finished recipes and list them on the home page`
+
+## Hands-on Checkpoints
+
+- [ ] Early usable behavior explored — after slice 2: the three-run kitchen listening test on the iPad, which decides whether the speech service fallback is needed, plus the screen recording test with the microphone on, which decides how the demo video is recorded
+- [ ] Integrated core journey explored — after slice 4: name to finished card, before the three extras, and the point to decide whether any extra is cut
+- [ ] Final kick-the-tires exploration and feedback completed
+
+## Final Review
+
+- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+
+## Code Tour and App Map
+
+- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
+- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+
+Activity and evidence: [what actually happened; real document/test/code references; unfinished work if interrupted]
+Route and stops: [actual paths and symbols; guided stops completed, or reference-only route]
+Edit outcome: [tried/kept/reverted/declined/not applicable; verification if changed]
+Reflection: [offered/answered/declined/already covered — personal answer belongs only in the ignored profile]
+Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
+
+## Revisions
+
+- For a rough amount, Gemini now also reports how many of the rough word mom said, and the measuring table multiplies ("two handfuls" becomes ½ cup). The spec had only the rough word, which could not express "two handfuls". Gemini still never produces a converted amount.
+- The check on Gemini's answer lives in its own file, `lib/server/checkAnswer.ts`, with tests. The spec placed checking inside the helper; a separate file keeps the helper short and lets the check be tested without calling Gemini.
+- `app/page.tsx` exists from slice 1 as a redirect to the session, so the plain address does not show an error page. Slice 4 replaces it with the home page.
+- Library versions settled at build: Next.js 16.3.8, `@google/genai` 2.27.0, TypeScript 7.0.2, Vitest 5.0.3. The call shape in `spec.md > External Services and Dependencies` matches the installed library's type definitions and worked unchanged against Gemini, including the answer format.

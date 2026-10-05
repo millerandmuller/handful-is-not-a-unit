@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handful Is Not a Unit: Scope</title>
+<!-- Visual companion to scope.md. The Markdown file is canonical; regenerate this page when it changes. -->
+<style>
+  :root {
+    --bg: #faf6ee;
+    --surface: #fffdf8;
+    --ink: #2b2118;
+    --muted: #6f6254;
+    --line: #e2d7c3;
+    --accent: #b4532a;
+    --accent-soft: #f4dfd0;
+    --now: #2f6b4f;
+    --later: #8a6a12;
+    --cut: #8c3b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1713;
+      --surface: #26201a;
+      --ink: #f1e8da;
+      --muted: #b3a593;
+      --line: #40362b;
+      --accent: #e58a5c;
+      --accent-soft: #3b2a20;
+      --now: #7fc7a2;
+      --later: #dcbb5e;
+      --cut: #e09090;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    line-height: 1.55;
+  }
+  main { max-width: 820px; margin: 0 auto; padding: 40px 16px 64px; }
+  .eyebrow {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  h1 { font-size: clamp(2rem, 6vw, 3rem); line-height: 1.1; margin: 8px 0 12px; }
+  h2 { font-size: 1.3rem; margin: 40px 0 10px; }
+  .lede { font-size: 1.15rem; color: var(--muted); margin: 0; }
+  .status {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 3px 10px;
+    border: 1px solid var(--now);
+    color: var(--now);
+    border-radius: 999px;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.8rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .kernel { border-left: 4px solid var(--accent); }
+  blockquote {
+    margin: 0;
+    padding: 14px 18px;
+    background: var(--accent-soft);
+    border-radius: 10px;
+    font-style: italic;
+  }
+  figure { margin: 0; }
+  figcaption { color: var(--muted); font-size: 0.9rem; margin-top: 8px; }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { font-family: ui-sans-serif, system-ui, sans-serif; fill: var(--ink); }
+  svg .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+  svg .hot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+  svg .arrow { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+  svg .head { fill: var(--muted); }
+  svg .small { font-size: 12px; fill: var(--muted); }
+  svg .label { font-size: 14px; font-weight: 600; }
+  ol.loop { padding-left: 1.3em; margin: 0; }
+  ol.loop li { margin-bottom: 6px; }
+  details {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    padding: 0 18px;
+  }
+  summary {
+    cursor: pointer;
+    padding: 14px 0;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+  }
+  details ul { margin: 0 0 16px; padding-left: 1.2em; }
+  details li { margin-bottom: 6px; }
+  .now summary { color: var(--now); }
+  .later summary { color: var(--later); }
+  .cut summary { color: var(--cut); }
+  .reason { color: var(--muted); }
+  footer { margin-top: 48px; color: var(--muted); font-size: 0.85rem; font-family: ui-sans-serif, system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Scope · proof of concept</div>
+  <h1>Handful Is Not a Unit</h1>
+  <p class="lede">An iPad on the kitchen counter listens while mom talks through a family recipe, and turns her "handfuls" and "about a scoop" into a recipe card her daughter can cook from later.</p>
+  <span class="status">Status: approved · 2026-10-04</span>
+
+  <h2>The unique kernel</h2>
+  <div class="card kernel">
+    The recipe has never had measurements. Grandma showed it, mom learned it by watching, and mom also cooks without measuring. Handful listens for every rough amount mom says out loud and resolves it into a measurement on the card, so the recipe can be repeated by someone who was not in the room.
+  </div>
+
+  <h2>How it fits together</h2>
+  <figure class="card">
+    <svg viewBox="0 0 760 300" role="img" aria-labelledby="dTitle dDesc">
+      <title id="dTitle">From mom's words to a recipe card</title>
+      <desc id="dDesc">Mom speaks a rough amount. The iPad listens. The app estimates a measurement. The daughter confirms or corrects it. The amount lands on the recipe card, which someone later cooks from to get the same dish.</desc>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path class="head" d="M0 0 L10 5 L0 10 z"/>
+        </marker>
+      </defs>
+
+      <rect class="box" x="10" y="40" width="150" height="80" rx="10"/>
+      <text class="label" x="85" y="72" text-anchor="middle">Mom cooks</text>
+      <text class="small" x="85" y="94" text-anchor="middle">"a handful of flour"</text>
+
+      <rect class="box" x="205" y="40" width="150" height="80" rx="10"/>
+      <text class="label" x="280" y="72" text-anchor="middle">iPad listens</text>
+      <text class="small" x="280" y="94" text-anchor="middle">speech becomes text</text>
+
+      <rect class="hot" x="400" y="40" width="150" height="80" rx="10"/>
+      <text class="label" x="475" y="66" text-anchor="middle">App estimates</text>
+      <text class="small" x="475" y="86" text-anchor="middle">handful, about ¼ cup</text>
+      <text class="small" x="475" y="104" text-anchor="middle">marked as an estimate</text>
+
+      <rect class="box" x="595" y="40" width="155" height="80" rx="10"/>
+      <text class="label" x="672" y="66" text-anchor="middle">Daughter</text>
+      <text class="small" x="672" y="86" text-anchor="middle">confirms, or corrects</text>
+      <text class="small" x="672" y="104" text-anchor="middle">if mom says it's off</text>
+
+      <path class="arrow" d="M160 80 H203" marker-end="url(#ah)"/>
+      <path class="arrow" d="M355 80 H398" marker-end="url(#ah)"/>
+      <path class="arrow" d="M550 80 H593" marker-end="url(#ah)"/>
+
+      <path class="arrow" d="M672 120 V205 H552" marker-end="url(#ah)"/>
+
+      <rect class="hot" x="400" y="170" width="150" height="70" rx="10"/>
+      <text class="label" x="475" y="200" text-anchor="middle">Recipe card</text>
+      <text class="small" x="475" y="220" text-anchor="middle">amounts and steps</text>
+
+      <path class="arrow" d="M400 205 H357" marker-end="url(#ah)"/>
+
+      <rect class="box" x="130" y="170" width="225" height="70" rx="10"/>
+      <text class="label" x="242" y="200" text-anchor="middle">The proof</text>
+      <text class="small" x="242" y="220" text-anchor="middle">cook from it, get the same dish</text>
+
+      <path class="arrow" d="M85 120 V275 H475 V242" stroke-dasharray="5 5" marker-end="url(#ah)"/>
+      <text class="small" x="280" y="292" text-anchor="middle">repeats for every ingredient mom adds</text>
+    </svg>
+    <figcaption>The two highlighted boxes are the heart of the build: turning a rough amount into a measurement, and the card that holds it.</figcaption>
+  </figure>
+
+  <h2>Who it's for</h2>
+  <p>A mom teaching her 10-year-old daughter a dish her own mother taught her. The daughter runs the app: she props her iPad on the counter while mom cooks and explains. Today the recipe lives only in mom's hands and memory, and it is passed on by watching.</p>
+
+  <h2>The core loop</h2>
+  <ol class="loop">
+    <li>The daughter props the iPad on the counter and starts a recipe.</li>
+    <li>Mom cooks and explains what she is adding, in her own rough amounts.</li>
+    <li>The iPad listens. Each time mom says an amount, the app tracks it.</li>
+    <li>The daughter sees it land and confirms ("great, okay").</li>
+    <li>At the end there is a recipe card with the ingredients, the measurements, and the steps.</li>
+  </ol>
+
+  <h2>Why this matters</h2>
+  <blockquote>"It's exciting to have something daughter will be able to use to cook with as she gets older and eventually cooks for her kids, so she can carry on the recipe(s)."</blockquote>
+
+  <h2>What "working" looks like</h2>
+  <p>The demo shows mom explaining the recipe to her daughter as she makes it, and the app resolves all of the measurements.</p>
+  <blockquote>"Someone sees the measurements of the recipe, such that when they go and cook with it, they get the same thing."</blockquote>
+  <p>The memorable beat: mom says "a handful of flour", and a real amount appears on the card next to her words.</p>
+
+  <h2>Now, later, cut</h2>
+  <details class="now" open>
+    <summary>Now: in the proof of concept (6)</summary>
+    <ul>
+      <li>One recipe, one cooking session, on one iPad.</li>
+      <li>The app listens to mom's speech and turns it into text.</li>
+      <li>It pulls out ingredients, rough amounts, and steps.</li>
+      <li>It turns each rough amount into a standard measurement, shown as an estimate next to mom's own words.</li>
+      <li>The daughter can confirm each amount, or correct it when mom says the estimate is off.</li>
+      <li>A finished recipe card on screen that can be read and cooked from.</li>
+    </ul>
+  </details>
+  <details class="later">
+    <summary>Later: worth doing, not now (4)</summary>
+    <ul>
+      <li>Working out amounts by watching mom through the camera.</li>
+      <li>Saving a collection of family recipes.</li>
+      <li>Printing or sharing the card.</li>
+      <li>Cooking from the card step by step on a later day.</li>
+    </ul>
+  </details>
+  <details class="cut">
+    <summary>Explicitly cut, with reasons (3)</summary>
+    <ul>
+      <li><strong>Live video measuring.</strong> <span class="reason">A camera cannot reliably tell how much is in a hand, and a confident wrong number would break the "cook it and get the same thing" test. It is also far beyond 2–4 hours of work.</span></li>
+      <li><strong>Accounts and logins.</strong> <span class="reason">Not needed to prove the kernel.</span></li>
+      <li><strong>Multiple cooks or multiple devices.</strong> <span class="reason">One kitchen, one iPad.</span></li>
+    </ul>
+  </details>
+
+  <h2>Confirmed at review</h2>
+  <div class="card">
+    <p style="margin-top:0"><strong>The camera is moved to "later".</strong></p>
+    <p style="margin-bottom:0"><strong>How a rough amount becomes a number:</strong> the app estimates a standard measurement from mom's words, labels it as an estimate, and lets the daughter correct it. An estimate from words alone will not guarantee the same dish; the correction step is what makes the card trustworthy.</p>
+  </div>
+
+  <footer>Visual companion to <code>devpost/scope.md</code>, which remains the canonical document. Look and feel is not decided yet and is covered in the product requirements step.</footer>
+</main>
+</body>
+</html>

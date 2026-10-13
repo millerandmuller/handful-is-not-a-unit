@@ -7,8 +7,9 @@ import { TypeOrPasteBox } from "@/components/TypeOrPasteBox";
 import { createEars } from "@/lib/ears";
 import type { Ears, EarsState } from "@/lib/ears";
 import { measureHeard } from "@/lib/measuringTable";
+import { addLines, changeAmount, confirmLine, removeLine } from "@/lib/sessionRules";
 import { createPhraseCollector, createUnderstandingQueue, UnderstandingError } from "@/lib/understandingClient";
-import type { HeardIngredient, IngredientLine as Line } from "@/lib/types";
+import type { Amount, HeardIngredient, IngredientLine as Line } from "@/lib/types";
 
 interface FailedText {
   text: string;
@@ -40,13 +41,18 @@ export default function SessionPage() {
   const lineCount = useRef(0);
   const understand = useRef(createUnderstandingQueue()).current;
 
-  function addLines(heard: HeardIngredient[]) {
+  // Every change to the lines goes through one of the session rules.
+  function updateLines(rule: (current: Line[]) => Line[]) {
+    latestLines.current = rule(latestLines.current);
+    setLines(latestLines.current);
+  }
+
+  function addHeard(heard: HeardIngredient[]) {
     const added = heard.map((ingredient) => {
       lineCount.current += 1;
       return toLine(ingredient, `line-${lineCount.current}`);
     });
-    latestLines.current = [...latestLines.current, ...added];
-    setLines(latestLines.current);
+    updateLines((current) => addLines(current, added));
   }
 
   async function readText(text: string) {
@@ -54,7 +60,7 @@ export default function SessionPage() {
     setReading((count) => count + 1);
     try {
       const answer = await understand(text, () => latestLines.current.map((line) => line.name));
-      addLines(answer.ingredients);
+      addHeard(answer.ingredients);
       setSteps((current) => [...current, ...answer.steps]);
     } catch (error) {
       // No line is invented. The words are kept so they can be sent again.
@@ -106,7 +112,13 @@ export default function SessionPage() {
         ) : (
           <ul className="lines" aria-live="polite">
             {lines.map((line) => (
-              <IngredientLine key={line.id} line={line} />
+              <IngredientLine
+                key={line.id}
+                line={line}
+                onConfirm={(id) => updateLines((current) => confirmLine(current, id))}
+                onChange={(id: string, amount: Amount) => updateLines((current) => changeAmount(current, id, amount))}
+                onRemove={(id) => updateLines((current) => removeLine(current, id))}
+              />
             ))}
           </ul>
         )}

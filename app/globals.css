@@ -338,6 +338,58 @@ input {
   font-weight: 800;
 }
 
+/* ---- Confirm, change, remove ---- */
+
+.line__number--button {
+  min-height: var(--tap);
+  padding: 0 1rem;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  text-decoration: underline dotted var(--delft);
+  text-underline-offset: 6px;
+  cursor: pointer;
+}
+.line__number--button:hover {
+  background: rgba(31, 78, 140, 0.08);
+}
+
+.line__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.picker {
+  grid-column: 1 / -1;
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: var(--paper);
+  border: 1.5px dashed var(--delft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.picker__hint {
+  margin: 0;
+  font-weight: 700;
+}
+.picker__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.picker__option--current {
+  cursor: default;
+}
+.picker__close {
+  align-self: flex-start;
+}
+
 @media (max-width: 560px) {
   .line {
     grid-template-columns: auto 1fr;

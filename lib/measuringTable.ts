@@ -63,6 +63,11 @@ const ROUGH_WORDS: readonly RoughEntry[] = [
   { words: ["teaspoon", "teaspoons", "tsp"], one: { quantity: 1, unit: "teaspoon" } },
 ];
 
+/** Every rough word the table knows, in every spelling. Used by the tests. */
+export function allRoughWords(): string[] {
+  return ROUGH_WORDS.flatMap((entry) => [...entry.words]);
+}
+
 const UNIT_NAMES: Record<string, string> = {
   cup: "cup",
   cups: "cup",

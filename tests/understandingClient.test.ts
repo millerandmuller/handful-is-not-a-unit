@@ -43,3 +43,28 @@ describe("the understanding queue", () => {
     await expect(understand("eggs", () => [])).resolves.toEqual(empty);
   });
 });
+
+describe("the phrase collector", () => {
+  it("joins phrases said close together and hands them over after a pause", async () => {
+    const { createPhraseCollector } = await import("../lib/understandingClient");
+    const { vi } = await import("vitest");
+    vi.useFakeTimers();
+    const ready: string[] = [];
+    const collector = createPhraseCollector((text) => ready.push(text), 1000);
+
+    collector.add("a handful of");
+    vi.advanceTimersByTime(600);
+    collector.add("flour");
+    vi.advanceTimersByTime(600);
+    expect(ready).toEqual([]);
+    vi.advanceTimersByTime(500);
+    expect(ready).toEqual(["a handful of flour"]);
+
+    collector.add("two eggs");
+    collector.flush();
+    expect(ready).toEqual(["a handful of flour", "two eggs"]);
+    collector.flush();
+    expect(ready).toHaveLength(2);
+    vi.useRealTimers();
+  });
+});

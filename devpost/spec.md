@@ -7,12 +7,12 @@ status: approved
 
 ## How This Works, In Plain Language
 
-Handful is a web page the daughter opens in Safari on her iPad. It has four working parts.
+Handful is a web page the daughter opens in Safari on her iPhone or iPad. It has four working parts.
 
-1. **The page on the iPad.** Everything the daughter sees and taps: the recipe list, the listening screen, the questions, the card. It also holds the session while mom is cooking.
-2. **The ears.** The iPad's own built-in speech recognition turns mom's voice into text. No extra account or key. If it proves unreliable in the kitchen, a speech service takes over, and a box for typing or pasting text is always there as the last resort.
+1. **The page on the iPhone or iPad.** Everything the daughter sees and taps: the recipe list, the listening screen, the questions, the card. It also holds the session while mom is cooking.
+2. **The ears.** The iPhone or iPad's own built-in speech recognition turns mom's voice into text. No extra account or key. If it proves unreliable in the kitchen, a speech service takes over, and a box for typing or pasting text is always there as the last resort.
 3. **The helper on the server.** A small program that lives on Vercel (the company hosting the page). The page sends it the text of what mom just said. The helper passes it to Google's Gemini, an AI service, with instructions to pick out ingredients, amounts, steps, and anything unclear. The helper exists for one reason: it keeps the Gemini key secret. The key is a password, and it must never be inside the page, where anyone could read it.
-4. **The recipe box on the iPad.** Finished recipes and their photos are saved in the browser's own storage on that iPad. Nothing is saved on a server, so there are no accounts.
+4. **The recipe box on the iPhone or iPad.** Finished recipes and their photos are saved in the browser's own storage on that iPhone or iPad. Nothing is saved on a server, so there are no accounts.
 
 One rule holds it together: **the AI reads, the app measures.** Gemini only says "mom said a handful of flour". The amount shown for "a handful" comes from a fixed table inside the app, not from the AI. The same words always give the same estimate, the estimate is always labeled, and the daughter can correct it. When the table has no entry for what mom said, the app asks a question instead of guessing.
 
@@ -21,13 +21,13 @@ Why this shape and not something bigger: it has one outside service, one key, no
 ## The Core Journey Through the System
 PRD ref: `prd.md > The Core Journey`.
 
-1. The daughter opens the page. It reads the recipe box on the iPad and shows the saved recipes and **New**.
+1. The daughter opens the page. It reads the recipe box on the iPhone or iPad and shows the saved recipes and **New**.
 2. She taps **New** and types the dish name. The page keeps the name in memory.
 3. She starts listening. Safari asks permission to use the microphone the first time.
-4. Mom says "a handful of flour". The ears turn it into text on the iPad.
+4. Mom says "a handful of flour". The ears turn it into text on the iPhone or iPad.
 5. The page sends that text to the helper. The helper asks Gemini and gets back a tidy answer: ingredient "flour", mom's words "a handful", kind "rough", rough word "handful", picture group "grain".
 6. The page looks "handful" up in its fixed table, gets "¼ cup", and adds a line: flour, its picture, "a handful", "about ¼ cup", labeled estimate.
-7. The daughter taps to confirm, or taps the amount and picks a nearby one. She may tap the camera button; the iPad camera opens, and the photo is attached to that line.
+7. The daughter taps to confirm, or taps the amount and picks a nearby one. She may tap the camera button; the iPhone or iPad camera opens, and the photo is attached to that line.
 8. If Gemini reports something unclear, or the table has no entry, a question appears. Unanswered questions stay in the queue.
 9. She taps **Finish**. The page shows each leftover question and each unconfirmed estimate, then asks for a photo of the finished meal.
 10. The page saves the recipe and its photos into the recipe box and shows the card.
@@ -43,25 +43,25 @@ PRD ref: `prd.md > The Core Journey`.
 | Understanding | Gemini API, model `gemini-3.8-flash`, via the `@google/genai` library. Docs: https://ai.google.dev/gemini-api/docs | One AI service that reads text now and can also take audio if the built-in ears fail. |
 | Saving recipes | IndexedDB (browser storage) via the small `idb-keyval` library. Docs: https://github.com/jakearchibald/idb-keyval | Photos are too large for the simpler browser storage. |
 | Tests | Vitest. Docs: https://vitest.dev | Checks the measuring table and session rules automatically. |
-| Hosting | Vercel. Docs: https://vercel.com/docs | Owner's decision. Gives the secure address the iPad microphone requires. |
+| Hosting | Vercel. Docs: https://vercel.com/docs | Owner's decision. Gives the secure address the iPhone or iPad microphone requires. |
 
 Checked on 2026-10-05 against Google's documentation: the model name, the request shape in `External Services and Dependencies`, and the prices.
 
 Not verified, to check early in the build:
-- Whether the built-in speech recognition in Safari on iPad keeps listening through a whole cooking session. This is the least certain piece of the whole plan.
+- Whether the built-in speech recognition in Safari on iPhone or iPad keeps listening through a whole cooking session. This is the least certain piece of the whole plan.
 - The exact current Next.js and `@google/genai` version numbers.
-- The audio format an iPad records in, and whether Gemini accepts it. Only matters if the speech service fallback is needed.
+- ~~The audio format an iPhone or iPad records in, and whether Gemini accepts it.~~ Not needed: the speech service fallback was not needed (see Revisions).
 
 ## Where It Runs and How Someone Tries It
 
-- **Runs in:** Safari on an iPad, served from Vercel over a secure (https) address. Also works in Chrome or Safari on the laptop for development and as a recording fallback.
+- **Runs in:** Safari on an iPhone or iPad, served from Vercel over a secure (https) address. Also works in Chrome or Safari on the laptop for development and as a recording fallback.
 - **Needs:** Node.js 20 or newer on the laptop (version 25 is installed), and one secret, `GEMINI_API_KEY`.
 - **Where the key lives:** on the laptop in a file named `.env.local`, which git ignores; on Vercel in the project's environment settings. Never in the page, never in a commit, never in chat.
 - **Start it on the laptop:** `npm install`, then `npm run dev`, then open `http://localhost:3000`. The microphone works on this address on the laptop.
 - **Run the checks:** `npm test`.
 - **Put it online:** `vercel` for a preview address, `vercel --prod` for the final one. The agent asks before every deploy.
-- **Try it on the iPad:** open the Vercel address in Safari, allow the microphone, tap **New**.
-- **For the demo video:** record the iPad screen with sound (iPad screen recording, microphone on) while a recipe is talked through. A laptop recording of the same address is the fallback.
+- **Try it on the iPhone or iPad:** open the Vercel address in Safari, allow the microphone, tap **New**.
+- **For the demo video:** record the laptop screen with sound (screen recording with listening on) while a recipe is talked through, using the same Vercel address. Recording the iPhone or iPad screen does not work: see Revisions.
 - Submission needs the demo video and a public GitHub repository. The Vercel address is an extra, not a replacement for either.
 
 ## Look and Feel
@@ -96,7 +96,7 @@ PRD ref: `prd.md > Listening and ingredient lines`, `prd.md > States and Boundar
 
 ### Type-or-paste box
 A text box on the Session screen. Whatever is typed or pasted goes through exactly the same path as spoken text. Always present, so the app works even with no microphone.
-PRD ref: `prd.md > States and Boundaries` (the iPad cannot understand).
+PRD ref: `prd.md > States and Boundaries` (the iPhone or iPad cannot understand).
 
 ### Understanding client
 Collects new phrases, sends them to the helper one request at a time, and returns the tidy answer. Tells the helper which ingredients are already on the list so they are not added twice.
@@ -139,7 +139,7 @@ A small drawn icon chosen by food group (grain, dairy, egg, vegetable, fruit, me
 PRD ref: `prd.md > Listening and ingredient lines`.
 
 ### Photo button
-Opens the iPad camera through the browser's standard photo picker, shrinks the photo to a sensible size, and attaches it to a line or to the recipe as the finished meal image. Photos stay on the iPad.
+Opens the iPhone or iPad camera through the browser's standard photo picker, shrinks the photo to a sensible size, and attaches it to a line or to the recipe as the finished meal image. Photos stay on the iPhone or iPad.
 PRD ref: `prd.md > Photos`.
 
 ### Recipe card screen
@@ -147,12 +147,12 @@ The finished recipe: name, meal image, ingredients with amounts and mom's words,
 PRD ref: `prd.md > The recipe card`.
 
 ### Recipe box (saving)
-Saves, lists and loads finished recipes on the iPad.
+Saves, lists and loads finished recipes on the iPhone or iPad.
 PRD ref: `prd.md > Recipe list`, `prd.md > States and Boundaries` (what persists).
 
 ## Data Model
 
-**Recipe** (saved in the Recipe box on the iPad when the session is finished)
+**Recipe** (saved in the Recipe box on the iPhone or iPad when the session is finished)
 - `id`, `name`, `finishedAt`
 - `mealPhoto` (optional image)
 - `ingredients`: list of Ingredient lines
@@ -170,7 +170,7 @@ PRD ref: `prd.md > Recipe list`, `prd.md > States and Boundaries` (what persists
 
 Where each piece lives:
 - **A session in progress** lives in the page's memory only. Closing the page before finishing loses it (approved in the PRD).
-- **Finished recipes and photos** live in the browser's storage on that iPad. They survive closing and reopening Safari. They do not appear on any other device, and clearing Safari's website data deletes them.
+- **Finished recipes and photos** live in the browser's storage on that iPhone or iPad. They survive closing and reopening Safari. They do not appear on any other device, and clearing Safari's website data deletes them.
 - **Nothing** is stored on the server.
 
 ## File Structure
@@ -201,7 +201,7 @@ product/
 │   ├── lineDisplay.ts          # What a line shows: amount, estimate label, mom's words
 │   ├── ears.ts                 # Built-in speech recognition
 │   ├── understandingClient.ts  # Sends text to the helper
-│   ├── recipeBox.ts            # Saving and loading on the iPad
+│   ├── recipeBox.ts            # Saving and loading on the iPhone or iPad
 │   ├── photo.ts                # Shrinking photos
 │   └── server/
 │       ├── gemini.ts           # The one place that calls Gemini
@@ -273,15 +273,15 @@ const answer = JSON.parse(interaction.output_text);
 ## Important Failure Modes
 
 - **The built-in ears stop or mishear in a noisy kitchen** → the listening sign shows "not listening", listening restarts by itself, and the type-or-paste box is always there. If the three-times kitchen test fails, the speech service fallback is built.
-- **The iPad is not allowed to use the microphone** → a plain message explains how to allow it in Safari, and the type-or-paste box still works.
+- **The iPhone or iPad is not allowed to use the microphone** → a plain message explains how to allow it in Safari, and the type-or-paste box still works.
 - **Gemini is slow, unreachable, or returns something unusable** → the line of text is kept and retried once; if it still fails, a small "couldn't understand that, try again" message appears and no line is invented.
 - **A rough word the table does not know** → a question, never a guess.
-- **Photos fill the iPad's browser storage** → photos are shrunk before saving; if saving a photo fails, the recipe is saved without it and the daughter is told.
+- **Photos fill the iPhone or iPad's browser storage** → photos are shrunk before saving; if saving a photo fails, the recipe is saved without it and the daughter is told.
 
 ## What Was Simplified and Why
 
 - **A fixed measuring table** instead of the AI judging each amount. The same words always give the same estimate, and it can be tested. The fuller version would consider the ingredient (a handful of spinach is not a handful of flour); here the daughter's correction covers that.
-- **Recipes saved on one iPad** instead of shared between devices. Sharing would need accounts and a database.
+- **Recipes saved on one iPhone or iPad** instead of shared between devices. Sharing would need accounts and a database.
 - **The daughter snaps photos** instead of the app choosing the moment. Automatic capture would need live video analysis.
 - **Drawn food-group icons** instead of a picture for every ingredient. Owner's decision to avoid stock photos and their copyright risks.
 - **New lines only.** If mom adds more of something already listed, the app does not merge it; it may ask a question. Merging would need the AI to edit existing lines.
@@ -291,7 +291,7 @@ const answer = JSON.parse(interaction.output_text);
 
 **Owner's decisions**
 - Web app in Safari, hosted on Vercel. The key is stored only in Vercel's environment settings, a spending cap is set, and the agent asks before it deploys.
-- Listening: the iPad's built-in speech recognition first, tested three times in the kitchen; a speech service if it fails; typing or a pasted transcript as the fallback.
+- Listening: the iPhone or iPad's built-in speech recognition first, tested three times in the kitchen; a speech service if it fails; typing or a pasted transcript as the fallback.
 - One AI service for understanding, to keep keys and data leaving the device to a minimum.
 - Ingredient pictures are plain illustrations or text labels, not stock photos.
 - Cut order if hours run short: saved recipe list, then photos on every ingredient, then ingredient pictures. Mom's words stay visible and every estimate stays labeled. This replaces the two-step order in `prd.md > Product Decisions`.
@@ -304,8 +304,14 @@ const answer = JSON.parse(interaction.output_text);
 - Drawn food-group icons as the source of ingredient pictures.
 
 **The one genuine uncertainty**
-- Whether the iPad's built-in speech recognition is good enough in a real kitchen. The owner's plan settles it by evidence: it is built and tested first, three times in the kitchen, before the rest depends on it. A pass means lines appear for at least most of what was said in each of the three runs; the result is written into the decision log.
+- Whether the iPhone or iPad's built-in speech recognition is good enough in a real kitchen. The owner's plan settles it by evidence: it is built and tested first, three times in the kitchen, before the rest depends on it. A pass means lines appear for at least most of what was said in each of the three runs; the result is written into the decision log. **Settled 2026-10-13: passed** (see Revisions).
 
 **Open issues**
 - The Vercel address is public. Anyone who finds it could use the helper until the spending cap stops them. Vercel can require a Vercel sign-in to open the page, at no cost and with no code. Owner to decide whether to switch that on; it can wait until the first deploy.
 - Carried from `prd.md > Open Questions`: recovering a session closed by accident stays out of the proof of concept.
+
+## Revisions
+
+- 2026-10-13: Every "iPad" now reads "iPhone or iPad", at the owner's decision: the product runs in Safari on an iPhone or an iPad. The wording was changed in this document, `scope.md`, `prd.md`, `checklist.md` and `README.md`; the design is unchanged.
+- 2026-10-13: The speech service fallback is not needed. Learner check results: on a laptop in Chrome and on an iPhone in Safari, both on the sign-in protected Vercel address, all spoken ingredients appeared as lines and the listening sign did not drop out. Rough words became labeled estimates, and "just a little bit" became "needs an answer". The built-in speech recognition stays the only way of listening, with the typing box as the last resort. The Gemini audio path described under External Services stays unused.
+- 2026-10-13: The demo video is recorded from the laptop. A laptop screen recording with listening on captured both the screen and the audio. On the iPhone, a Control Center recording with the microphone on lost its audio as soon as **Start listening** was tapped, because the microphone went to the app; the app kept capturing words. This replaces the iPhone or iPad recording plan in `Where It Runs and How Someone Tries It`.

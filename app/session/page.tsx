@@ -1,10 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IngredientLine } from "@/components/IngredientLine";
+import { ListeningSign } from "@/components/ListeningSign";
 import { TypeOrPasteBox } from "@/components/TypeOrPasteBox";
+import { createEars } from "@/lib/ears";
+import type { Ears, EarsState } from "@/lib/ears";
 import { measureHeard } from "@/lib/measuringTable";
-import { createUnderstandingQueue, UnderstandingError } from "@/lib/understandingClient";
+import { createPhraseCollector, createUnderstandingQueue, UnderstandingError } from "@/lib/understandingClient";
 import type { HeardIngredient, IngredientLine as Line } from "@/lib/types";
 
 interface FailedText {
@@ -27,6 +30,8 @@ export default function SessionPage() {
   const [steps, setSteps] = useState<string[]>([]);
   const [reading, setReading] = useState(0);
   const [failed, setFailed] = useState<FailedText | null>(null);
+  const [earsState, setEarsState] = useState<EarsState>("off");
+  const [hearing, setHearing] = useState("");
 
   // The queue reads the ingredient names at the moment a request is sent,
   // which can be before React has drawn the newest lines. This ref always
@@ -60,6 +65,22 @@ export default function SessionPage() {
     }
   }
 
+  // Spoken phrases take exactly the same path as typed text: readText.
+  // The ref keeps the ears pointed at the newest readText without restarting them.
+  const readSpoken = useRef(readText);
+  readSpoken.current = readText;
+  const ears = useRef<Ears | null>(null);
+
+  useEffect(() => {
+    const collector = createPhraseCollector((text) => readSpoken.current(text));
+    const created = createEars({ onPhrase: collector.add, onHearing: setHearing, onState: setEarsState });
+    ears.current = created;
+    return () => {
+      created.stop();
+      collector.flush();
+    };
+  }, []);
+
   return (
     <main className="session">
       <header className="session__header">
@@ -67,13 +88,20 @@ export default function SessionPage() {
         <h1 className="session__title">New recipe</h1>
       </header>
 
+      <ListeningSign
+        state={earsState}
+        hearing={hearing}
+        onStart={() => ears.current?.start()}
+        onStop={() => ears.current?.stop()}
+      />
+
       <section aria-labelledby="ingredients-title">
         <h2 id="ingredients-title" className="section__title">
           Ingredients
         </h2>
         {lines.length === 0 ? (
           <p className="empty">
-            Nothing here yet. Tell me what mom is adding, like <span className="moms-words">a handful of flour</span>
+            Nothing here yet. Start listening, or type what mom is adding, like <span className="moms-words">a handful of flour</span>
           </p>
         ) : (
           <ul className="lines" aria-live="polite">

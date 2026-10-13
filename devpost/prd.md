@@ -5,15 +5,15 @@ status: approved
 
 # Handful Is Not a Unit: Product Requirements
 
-An iPad app that listens while mom talks through a family recipe and turns her rough amounts into a recipe card her 10-year-old daughter can cook from later.
+An iPhone or iPad app that listens while mom talks through a family recipe and turns her rough amounts into a recipe card her 10-year-old daughter can cook from later.
 Source: `scope.md > The Unique Kernel`, `scope.md > The Core Loop`, `scope.md > What "Working" Looks Like`.
 
 ## The Core Journey
 Develops `scope.md > The Core Loop`.
 
-1. The daughter opens Handful on her iPad and sees the recipes already captured on this iPad, plus a **New** button.
+1. The daughter opens Handful on her iPhone or iPad and sees the recipes already captured on this iPhone or iPad, plus a **New** button.
 2. She taps **New** and enters the name of the dish.
-3. She props the iPad on the counter and starts listening. Mom cooks and explains what she is adding.
+3. She props the iPhone or iPad on the counter and starts listening. Mom cooks and explains what she is adding.
 4. Each time mom names an ingredient and an amount, a new line appears: the ingredient with its picture, mom's own words ("a handful of flour"), and what the app converts that to ("about ¼ cup", marked as an estimate).
 5. The daughter confirms the line, or changes the amount when mom says the estimate is off. She can also snap a photo of mom adding that ingredient.
 6. When the app is unsure about something it heard, it asks a question. Questions nobody answers during cooking wait in a queue.
@@ -27,9 +27,9 @@ Success: someone who was not in the kitchen can cook from the card and get the s
 
 Five surfaces, in the order the daughter meets them.
 
-1. **Recipe list (home).** The recipes captured on this iPad, each shown by name, and a **New** button.
+1. **Recipe list (home).** The recipes captured on this iPhone or iPad, each shown by name, and a **New** button.
 2. **Name the recipe.** One input for the dish name, and a way to begin.
-3. **Listening session.** The main screen. A clear sign that the iPad is listening, the growing list of ingredient lines, and any question the app is asking right now. A way to finish.
+3. **Listening session.** The main screen. A clear sign that the iPhone or iPad is listening, the growing list of ingredient lines, and any question the app is asking right now. A way to finish.
 4. **Leftover questions.** Shown after finishing: the queued questions, one at a time, and the prompt to add the finished meal image.
 5. **Recipe card.** The finished recipe. Reached at the end of a session, or by tapping a recipe in the list.
 
@@ -47,7 +47,7 @@ In the learner's words: "homemade, mom to daughter, carefully passed on, beautif
 ### Recipe list
 Develops a small version of `scope.md > Later` (saving a collection), brought into the proof of concept by the learner.
 
-- Recipes finished on this iPad stay on this iPad and appear in the list.
+- Recipes finished on this iPhone or iPad stay on this iPhone or iPad and appear in the list.
 - Tapping a recipe opens its card.
 - **New** starts a new recipe.
   - [ ] After finishing a recipe and reopening the app, that recipe is in the list.
@@ -61,7 +61,7 @@ Develops a small version of `scope.md > Later` (saving a collection), brought in
 ### Listening and ingredient lines
 Develops `scope.md > The Unique Kernel`.
 
-- While the session runs, the iPad listens to mom and the screen shows that it is listening.
+- While the session runs, the iPhone or iPad listens to mom and the screen shows that it is listening.
 - When mom names an ingredient with an amount, a line appears with: the ingredient name, a simple picture of the ingredient, mom's own words, and the converted amount.
 - A rough amount ("a handful", "about a scoop", "approximately a cup") is converted to a standard kitchen measurement and marked as an estimate.
 - An exact amount ("two eggs", "one cup of milk") appears as said, with no estimate mark.
@@ -119,16 +119,16 @@ Develops `scope.md > What "Working" Looks Like`.
 
 - **First use.** The recipe list is empty. The screen says so in a friendly way and points to **New**.
 - **Listening, nothing heard yet.** The session screen shows it is listening and invites mom to start talking.
-- **The iPad is not allowed to listen.** The app explains that it needs to hear mom and how to allow it. The session does not start silently broken.
-- **The iPad cannot understand.** If it stops hearing or cannot make sense of what was said, it says so on screen and does not invent lines.
+- **The iPhone or iPad is not allowed to listen.** The app explains that it needs to hear mom and how to allow it. The session does not start silently broken.
+- **The iPhone or iPad cannot understand.** If it stops hearing or cannot make sense of what was said, it says so on screen and does not invent lines.
 - **Camera not allowed or not used.** Photos are skipped; everything else works.
 - **Finishing with nothing captured.** The app says there is nothing to make a card from and lets her keep listening or leave.
-- **What persists.** Finished recipes, with their photos, stay on this iPad.
+- **What persists.** Finished recipes, with their photos, stay on this iPhone or iPad.
 - **What does not persist.** A session that is closed before finishing is not kept (proposed by the agent, approved at review).
 
 ## Product Decisions
 
-- The first screen lists recipes and has a **New** button. Learner's choice: "options for different recipes mom could share with her, or a 'new' button to intake a new recipe." Small version chosen: recipes made on this iPad only.
+- The first screen lists recipes and has a **New** button. Learner's choice: "options for different recipes mom could share with her, or a 'new' button to intake a new recipe." Small version chosen: recipes made on this iPhone or iPad only.
 - The dish name is entered at the beginning. Learner's choice.
 - Each line shows what mom said next to what the app converted it to, with images. Learner's choice.
 - Images are a picture of the ingredient plus an optional snapped photo of mom adding it. Small version chosen by the learner: the daughter taps to snap; the app does not choose the moment.
@@ -168,7 +168,7 @@ Proposed by the agent and approved by the learner at review on 2026-10-04:
 - The app asking its questions out loud.
 
 ## Non-Goals
-- **No accounts or logins.** One kitchen, one iPad.
+- **No accounts or logins.** One kitchen, one iPhone or iPad.
 - **No measuring from video.** A confident wrong number would break the "cook it and get the same thing" test.
 - **No recipe search, import from websites, or meal planning.** This captures one family's spoken recipes.
 - **No nutrition or allergen information.** Outside the kernel.
@@ -176,3 +176,7 @@ Proposed by the agent and approved by the learner at review on 2026-10-04:
 ## Open Questions
 - Resolved at review: amounts are shown in cups and spoons.
 - Should a session closed by accident be recoverable? Can wait; assumed no for the proof of concept.
+
+## Revisions
+
+- 2026-10-13: Every "iPad" now reads "iPhone or iPad", at the owner's decision: the product runs in Safari on an iPhone or an iPad. Wording only; behavior and the proof-of-concept boundary are unchanged.

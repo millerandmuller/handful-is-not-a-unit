@@ -354,3 +354,79 @@ input {
     flex-direction: column;
   }
 }
+
+/* ---- Listening sign ---- */
+
+.sign {
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius);
+  background: var(--card);
+  border: 2px solid var(--card-edge);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.sign--listening {
+  border-color: var(--pandan);
+  background: #e6ecd6;
+}
+.sign--stopped,
+.sign--not-allowed,
+.sign--not-available {
+  border-color: var(--tomato);
+  background: var(--tomato-wash);
+}
+.sign__row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.sign__dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--ink-soft);
+  flex: none;
+}
+.sign--listening .sign__dot {
+  background: var(--pandan);
+  animation: breathe 1.6s ease-in-out infinite;
+}
+.sign--stopped .sign__dot,
+.sign--not-allowed .sign__dot,
+.sign--not-available .sign__dot {
+  background: var(--tomato);
+}
+@keyframes breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 127, 69, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(79, 127, 69, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sign--listening .sign__dot {
+    animation: none;
+  }
+}
+.sign__message {
+  margin: 0;
+  flex: 1;
+  min-width: 12rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+.sign__hearing {
+  margin: 0;
+  color: var(--ink-soft);
+}
+.sign__hearing .moms-words {
+  color: var(--ink-soft);
+}
+.sign__help {
+  margin: 0;
+  font-size: 1.1rem;
+}

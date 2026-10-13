@@ -1,6 +1,6 @@
 # Handful Is Not a Unit
 
-An iPad on the kitchen counter listens while mom talks through a family recipe, and turns her "handfuls" and "about a scoop" into a recipe card her daughter can cook from later.
+An iPhone or iPad on the kitchen counter listens while mom talks through a family recipe, and turns her "handfuls" and "about a scoop" into a recipe card her daughter can cook from later.
 
 Mom says "a handful of flour". The card shows flour, her own words in handwriting, and "about ¼ cup", marked as an estimate until someone confirms or corrects it.
 
@@ -8,12 +8,14 @@ This is a proof of concept built for the Devpost hackathon "Build With AI: Basic
 
 ## What works today
 
-- Type or paste what mom said, and ingredient lines appear: the ingredient, mom's words, and the amount.
+- Tap **Start listening** and talk: the browser's built-in speech recognition turns mom's voice into text, and ingredient lines appear while she is still talking.
+- Or type or paste what mom said. Typed text takes exactly the same path as spoken words, so the app works with no microphone at all.
+- Each line shows the ingredient, mom's words, and the amount.
 - Rough amounts ("a handful", "a pinch") become labeled estimates. Exact amounts ("two eggs") appear as said.
 - What mom says about how to cook is kept as steps, in her words.
 - Kitchen talk that is not part of the recipe is ignored.
 
-Still to come: listening through the microphone, confirming and changing amounts, questions from the app, the finished recipe card, pictures, photos, and the saved recipe list.
+Still to come: confirming and changing amounts, questions from the app, the finished recipe card, pictures, photos, and the saved recipe list.
 
 ## How AI was used
 
@@ -35,7 +37,7 @@ Still to come: listening through the microphone, confirming and changing amounts
 
 | What | Where it goes | Is it stored? |
 |---|---|---|
-| Audio | The app does not record or handle audio yet; listening is the next step. | No |
+| Audio | The app never records, saves or sends audio itself. When listening is on, the browser's built-in speech recognition turns the sound into text. In Safari that recognition is provided by Apple and the audio may be processed on Apple's servers; in Chrome it is provided by Google. | Not by this app. |
 | The text of what mom said | From the page to this app's own helper (`/api/understand`), which passes it to Google's Gemini API together with the names of the ingredients already on the list. | Not by this app. The helper keeps nothing. Google's handling depends on the Gemini tier: on the free tier, what is sent may be used to improve Google's products; on the paid tier it is not. |
 | Photos | Not part of the app yet. | No |
 | The recipe in progress | It lives in the page's memory only. | No. Closing or reloading the page loses it. |
@@ -65,11 +67,31 @@ Run the automatic checks:
 npm test
 ```
 
+### On an iPhone or iPad
+
+An iPhone or iPad only lets a web page use the microphone on a secure (https) address, so the app has to be hosted. This project is hosted on Vercel, with `GEMINI_API_KEY` stored in the Vercel project's environment settings and never in the code.
+
+1. Open the hosted address in Safari on the iPhone or iPad.
+2. Go to the session screen and tap **Start listening**.
+3. Allow the microphone when Safari asks.
+
+If Safari stops listening by itself, the app starts it again. If the microphone is not allowed or the browser cannot listen, the screen says so and the typing box still works.
+
+### What was found about listening and screen recording
+
+Checked on 2026-10-13, on the hosted address:
+
+- **Listening works.** On a laptop in Chrome and on an iPhone in Safari, every spoken ingredient appeared as a line and the listening sign did not drop out. Rough words became labeled estimates, and "just a little bit" became "needs an answer". Two runs were made, one per device; a separate speech service was judged not needed.
+- **Recording the laptop screen works.** A screen recording made with listening on captured both the screen and the sound.
+- **Recording the iPhone screen does not.** A Control Center recording with the microphone on lost its audio the moment **Start listening** was tapped, because the microphone went to the app. The app kept capturing words. To film the app, record the laptop screen, or use another device or camera to film the phone.
+- The address is protected by a Vercel sign-in, so the device has to be signed in to Vercel in its browser.
+
 ## How it is put together
 
 | Part | File |
 |---|---|
 | The session screen | `app/session/page.tsx` |
+| The ears (speech to text, restarts itself) | `lib/ears.ts` |
 | The measuring table (rough words to estimates) | `lib/measuringTable.ts` |
 | The helper on the server that holds the key | `app/api/understand/route.ts` |
 | The one place that calls Gemini | `lib/server/gemini.ts` |

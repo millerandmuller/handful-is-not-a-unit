@@ -62,3 +62,38 @@ export function createUnderstandingQueue(send: SendToHelper = sendToHelper): Und
     return answer;
   };
 }
+
+export interface PhraseCollector {
+  add(phrase: string): void;
+  /** Sends whatever has been collected right away. */
+  flush(): void;
+}
+
+/**
+ * Collects spoken phrases and hands them over together once mom pauses, so
+ * "a handful of" and "flour" reach the helper as one piece of text.
+ */
+export function createPhraseCollector(onReady: (text: string) => void, pauseMs: number = 1200): PhraseCollector {
+  let phrases: string[] = [];
+  let timer: ReturnType<typeof setTimeout> | null = null;
+
+  function flush() {
+    if (timer) clearTimeout(timer);
+    timer = null;
+    if (phrases.length === 0) return;
+    const text = phrases.join(" ");
+    phrases = [];
+    onReady(text);
+  }
+
+  return {
+    add(phrase) {
+      const cleaned = phrase.trim();
+      if (cleaned === "") return;
+      phrases.push(cleaned);
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(flush, pauseMs);
+    },
+    flush,
+  };
+}

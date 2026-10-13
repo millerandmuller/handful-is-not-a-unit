@@ -613,3 +613,22 @@ input {
   color: var(--ink-soft);
   font-size: 1rem;
 }
+
+/* ---- Ingredient pictures ---- */
+
+/* The darker details in each drawing take the color of the tile behind it. */
+.tile--picture svg {
+  display: block;
+}
+.tile--picture.tile--delft svg {
+  color: var(--delft);
+}
+.tile--picture.tile--tomato svg {
+  color: var(--tomato);
+}
+.tile--picture.tile--mustard svg {
+  color: var(--mustard);
+}
+.tile--picture.tile--pandan svg {
+  color: var(--pandan);
+}

@@ -1,7 +1,7 @@
 import type { FoodGroup } from "@/lib/types";
 
 // The stand-in picture: a colored tile with the ingredient's first letter.
-const TILE_COLOR: Record<FoodGroup, string> = {
+export const TILE_COLOR: Record<FoodGroup, string> = {
   grain: "mustard",
   dairy: "delft",
   egg: "mustard",

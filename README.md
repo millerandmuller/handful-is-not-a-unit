@@ -18,7 +18,9 @@ This is a proof of concept built for the Devpost hackathon "Build With AI: Basic
 - When an ingredient is said with no amount, or with a word the app does not know, the app asks a question instead of guessing. Questions left alone come back after **Finish**, together with any estimate nobody confirmed. For an ingredient mom cannot give an amount for, the choices are to pick an amount, remove the line, or keep it "as mom says": it stays on the card with mom's words and no number. If mom gave no words at all, the line says "no amount given" instead.
 - **Finish** ends with the recipe card: the name, every ingredient with mom's words and its amount, the steps, and a short note that the amounts are estimates.
 
-Still to come: pictures for each ingredient, photos, and saving recipes (a finished card is gone when the page is closed for now).
+- Each ingredient has a small picture drawn in code for its food group (grain, dairy, egg, vegetable, fruit, meat, fish, spice, oil, liquid, sweet, other). Which group an ingredient belongs to is Gemini's reading; the app only draws the picture.
+
+Still to come: photos and saving recipes (a finished card is gone when the page is closed for now).
 
 ## How AI was used
 
@@ -98,6 +100,7 @@ Checked on 2026-10-13, on the hosted address:
 | The rules for lines, questions and what comes back after Finish | `lib/sessionRules.ts` |
 | What a line may show (so an estimate always has its label and mom's words) | `lib/lineDisplay.ts` |
 | The recipe card | `components/RecipeCard.tsx` |
+| The ingredient pictures (twelve drawings, one per food group) | `components/IngredientPicture.tsx` |
 | The ears (speech to text, restarts itself) | `lib/ears.ts` |
 | The measuring table (rough words to estimates) | `lib/measuringTable.ts` |
 | The helper on the server that holds the key | `app/api/understand/route.ts` |

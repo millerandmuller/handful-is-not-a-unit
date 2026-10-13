@@ -17,7 +17,7 @@ Return JSON with three lists.
 "ingredients": one entry for each ingredient she adds in newText.
 - Do not repeat an ingredient that is already in knownIngredients. If she clearly adds more of one, add a question instead (see below).
 - "name": the ingredient in plain lowercase words, as she said it ("flour", "eggs", "olive oil").
-- "foodGroup": the best fit from the allowed list.
+- "foodGroup": the best fit from the allowed list. Salt, pepper, chilies, chili peppers, paprika and other spices and dried herbs are "spice", never "vegetable".
 - "saidWords": her own words for the amount, exactly as said, without the ingredient ("a handful", "two", "about a scoop", "approximately a cup"). Use "" if she gave no amount.
 - "amountKind":
   - "exact" when she gives a real number, with or without a unit ("two eggs", "one cup of milk", "200 grams of butter", "a couple of eggs" means 2).

@@ -1,4 +1,4 @@
-import { IngredientTile } from "@/components/IngredientTile";
+import { IngredientPicture } from "@/components/IngredientPicture";
 import { lineDisplay } from "@/lib/lineDisplay";
 import type { IngredientLine } from "@/lib/types";
 
@@ -35,7 +35,7 @@ export function RecipeCard({ name, ingredients, steps }: RecipeCardProps) {
         <ul className="card__ingredients">
           {ingredients.map((line) => (
             <li key={line.id} className="card__ingredient">
-              <IngredientTile name={line.name} foodGroup={line.foodGroup} />
+              <IngredientPicture name={line.name} foodGroup={line.foodGroup} />
               <div className="line__what">
                 <span className="line__name">{line.name}</span>
                 {lineDisplay(line).saidWords && <span className="moms-words">{lineDisplay(line).saidWords}</span>}

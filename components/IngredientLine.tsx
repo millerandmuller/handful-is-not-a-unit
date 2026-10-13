@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AmountPicker } from "@/components/AmountPicker";
-import { IngredientTile } from "@/components/IngredientTile";
+import { IngredientPicture } from "@/components/IngredientPicture";
 import { lineDisplay } from "@/lib/lineDisplay";
 import type { Amount, IngredientLine as Line } from "@/lib/types";
 
@@ -21,7 +21,7 @@ export function IngredientLine({ line, onConfirm, onChange, onRemove }: Ingredie
 
   return (
     <li className="line line--new">
-      <IngredientTile name={line.name} foodGroup={line.foodGroup} />
+      <IngredientPicture name={line.name} foodGroup={line.foodGroup} />
       <div className="line__what">
         <span className="line__name">{line.name}</span>
         {shown.saidWords && <span className="moms-words">{shown.saidWords}</span>}

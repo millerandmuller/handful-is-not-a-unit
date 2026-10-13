@@ -12,6 +12,8 @@ import { TypeOrPasteBox } from "@/components/TypeOrPasteBox";
 import { createEars } from "@/lib/ears";
 import type { Ears, EarsState } from "@/lib/ears";
 import { measureHeard } from "@/lib/measuringTable";
+import { saveRecipe } from "@/lib/recipeBox";
+import type { SaveResult } from "@/lib/recipeBox";
 import {
   addLines,
   answerQuestion,
@@ -52,6 +54,13 @@ export default function SessionPage() {
   );
 }
 
+const SAVE_MESSAGE: Record<SaveResult | "saving", string> = {
+  saving: "Saving this recipe…",
+  saved: "Saved on this device. You will find it on the home page.",
+  "saved-without-photos": "Saved on this device, but without its photos: there was not enough room for them.",
+  failed: "This recipe could not be saved on this device. Keep this page open if you want to read it again.",
+};
+
 function Session() {
   const router = useRouter();
   const name = (useSearchParams().get("name") ?? "").trim();
@@ -67,6 +76,9 @@ function Session() {
   // Questions the daughter said "ask me later" to. They all come back after Finish.
   const [later, setLater] = useState<string[]>([]);
   const [view, setView] = useState<"cooking" | "finished">("cooking");
+  const [saved, setSaved] = useState<SaveResult | "saving" | null>(null);
+  // One id for the whole session, so finishing twice replaces the recipe instead of adding a second.
+  const recipeId = useRef<string | null>(null);
   const [reading, setReading] = useState(0);
   const [failed, setFailed] = useState<FailedText | null>(null);
   const [earsState, setEarsState] = useState<EarsState>("off");
@@ -149,6 +161,19 @@ function Session() {
   const changeLineAmount = (id: string, amount: Amount) => updateLines((current) => changeAmount(current, id, amount));
   const removeLineById = (id: string) => updateLines((current) => removeLine(current, id));
 
+  const items = leftovers(lines, questions);
+  const cardReady = view === "finished" && reading === 0 && !hasNothingToFinish(lines, steps) && items.length === 0;
+
+  // The card is the end of the session: keep the recipe on this device.
+  useEffect(() => {
+    if (!cardReady) return;
+    recipeId.current ??= crypto.randomUUID();
+    setSaved("saving");
+    saveRecipe({ id: recipeId.current, name, finishedAt: new Date().toISOString(), ingredients: lines, steps }).then(setSaved);
+    // lines, steps and name are settled once the card is ready; saving again on every render would repeat it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cardReady]);
+
   if (name === "") return null;
 
   const header = (
@@ -159,8 +184,6 @@ function Session() {
   );
 
   if (view === "finished") {
-    const items = leftovers(lines, questions);
-
     if (reading > 0) {
       return (
         <main className="session">
@@ -214,7 +237,9 @@ function Session() {
     return (
       <main className="session">
         <RecipeCard name={name} ingredients={lines} steps={steps} />
-        <p className="status">This recipe is not saved yet: it is gone when this page is closed.</p>
+        <p className="status" role="status">
+          {SAVE_MESSAGE[saved ?? "saving"]}
+        </p>
         <div className="notice__actions">
           <button type="button" className="button button--quiet" onClick={() => setView("cooking")}>
             Back to listening

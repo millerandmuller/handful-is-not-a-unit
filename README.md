@@ -20,7 +20,9 @@ This is a proof of concept built for the Devpost hackathon "Build With AI: Basic
 
 - Each ingredient has a small picture drawn in code for its food group (grain, dairy, egg, vegetable, fruit, meat, fish, spice, oil, liquid, sweet, other). Which group an ingredient belongs to is Gemini's reading; the app only draws the picture.
 
-Still to come: photos and saving recipes (a finished card is gone when the page is closed for now).
+- Finishing a recipe saves it on the device. The home page lists saved recipes, and tapping one opens the same card. They stay after Safari is closed. They are not shared between devices, and clearing the browser's website data deletes them.
+
+Still to come: photos.
 
 ## How AI was used
 
@@ -45,9 +47,10 @@ Still to come: photos and saving recipes (a finished card is gone when the page 
 | Audio | The app never records, saves or sends audio itself. When listening is on, the browser's built-in speech recognition turns the sound into text. In Safari that recognition is provided by Apple and the audio may be processed on Apple's servers; in Chrome it is provided by Google. | Not by this app. |
 | The text of what mom said | From the page to this app's own helper (`/api/understand`), which passes it to Google's Gemini API together with the names of the ingredients already on the list. | Not by this app. The helper keeps nothing. Google's handling depends on the Gemini tier: on the free tier, what is sent may be used to improve Google's products; on the paid tier it is not. |
 | Photos | Not part of the app yet. | No |
-| The recipe in progress and the finished card | It lives in the page's memory only. | No. Closing or reloading the page loses it. Saving finished recipes is still to come. |
+| The recipe in progress | It lives in the page's memory only. | No. Closing or reloading the page loses it. |
+| A finished recipe | It is saved in the browser's own storage (IndexedDB) on the device that made it. It is never sent to a server. | Yes, on that device only, until the browser's website data is cleared. |
 
-There are no accounts and no database. The Gemini key stays on the server and is never part of the page.
+There are no accounts and no server-side database. The Gemini key stays on the server and is never part of the page.
 
 ## How to run it
 
@@ -100,6 +103,7 @@ Checked on 2026-10-13, on the hosted address:
 | The rules for lines, questions and what comes back after Finish | `lib/sessionRules.ts` |
 | What a line may show (so an estimate always has its label and mom's words) | `lib/lineDisplay.ts` |
 | The recipe card | `components/RecipeCard.tsx` |
+| Saving and loading finished recipes on the device | `lib/recipeBox.ts`, `app/recipe/[id]/page.tsx` |
 | The ingredient pictures (twelve drawings, one per food group) | `components/IngredientPicture.tsx` |
 | The ears (speech to text, restarts itself) | `lib/ears.ts` |
 | The measuring table (rough words to estimates) | `lib/measuringTable.ts` |

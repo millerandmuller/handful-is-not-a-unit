@@ -1,5 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { addLines, changeAmount, confirmLine, removeLine } from "../lib/sessionRules";
+import {
+  addLines,
+  answerQuestion,
+  answerWithAmount,
+  changeAmount,
+  confirmLine,
+  hasNothingToFinish,
+  keepAsMomsSays,
+  leftovers,
+  openQuestions,
+  questionsFromReading,
+  removeLine,
+} from "../lib/sessionRules";
 import type { IngredientLine } from "../lib/types";
 
 function line(over: Partial<IngredientLine>): IngredientLine {
@@ -77,5 +89,92 @@ describe("removing", () => {
 
   it("does nothing for an id that is not there", () => {
     expect(removeLine([line({ id: "a" })], "zzz")).toHaveLength(1);
+  });
+});
+
+describe("questions", () => {
+  it("an ingredient said with no amount becomes a question, never an invented amount", () => {
+    const salt = line({ id: "s", name: "salt", saidWords: "", amount: null, status: "needs-answer" });
+    const [question] = questionsFromReading([salt], [], "r1");
+    expect(question).toMatchObject({ kind: "missing-amount", lineId: "s", answered: false, text: "How much salt was it?" });
+    expect(salt.amount).toBeNull();
+  });
+
+  it("a rough word the table does not know asks about mom's own words", () => {
+    const sugar = line({ id: "g", name: "sugar", saidWords: "a smidge", amount: null, status: "needs-answer" });
+    const [question] = questionsFromReading([sugar], [], "r1");
+    expect(question).toMatchObject({ kind: "unknown-rough-word", lineId: "g" });
+    expect(question.text).toContain("a smidge");
+  });
+
+  it("lines that have an amount ask nothing", () => {
+    expect(questionsFromReading([line({})], [], "r1")).toEqual([]);
+  });
+
+  it("does not ask twice when Gemini asks about an ingredient that already has its own question", () => {
+    const salt = line({ id: "s", name: "salt", saidWords: "", amount: null, status: "needs-answer" });
+    const questions = questionsFromReading([salt], [{ kind: "missing-amount", ingredientName: "Salt", text: "How much salt was it?" }], "r1");
+    expect(questions).toHaveLength(1);
+  });
+
+  it("keeps Gemini's other questions, with no line behind them", () => {
+    const questions = questionsFromReading([], [{ kind: "unclear-ingredient", ingredientName: null, text: "What did mom add?" }], "r2");
+    expect(questions).toEqual([{ id: "r2-0", kind: "unclear-ingredient", text: "What did mom add?", answered: false }]);
+  });
+
+  it("a question stays open until it is answered, and goes away when its line is answered or removed", () => {
+    const salt = line({ id: "s", name: "salt", saidWords: "", amount: null, status: "needs-answer" });
+    const questions = questionsFromReading([salt], [{ kind: "unclear-ingredient", ingredientName: null, text: "What?" }], "r1");
+    expect(openQuestions([salt], questions)).toHaveLength(2);
+
+    const answered = answerWithAmount([salt], "s", { quantity: 1, unit: "teaspoon" });
+    expect(openQuestions(answered, questions)).toHaveLength(1);
+    expect(openQuestions(removeLine([salt], "s"), questions)).toHaveLength(1);
+    expect(openQuestions([salt], answerQuestion(questions, "r1-0"))).toHaveLength(1);
+  });
+});
+
+describe("answering a line that had no amount", () => {
+  const salt = line({ id: "s", name: "salt", saidWords: "just a little bit", amount: null, status: "needs-answer" });
+
+  it("an amount picked by the daughter is her answer, not an estimate", () => {
+    const [answered] = answerWithAmount([salt], "s", { quantity: 1 / 2, unit: "teaspoon" });
+    expect(answered).toMatchObject({ status: "confirmed", amount: { quantity: 1 / 2, unit: "teaspoon" }, saidWords: "just a little bit" });
+  });
+
+  it("keeping it as mom says leaves mom's words, no number, and no estimate", () => {
+    const [kept] = keepAsMomsSays([salt], "s");
+    expect(kept).toMatchObject({ status: "as-moms-says", amount: null, saidWords: "just a little bit" });
+  });
+
+  it("only works on a line that is waiting for an answer", () => {
+    const flour = line({});
+    expect(keepAsMomsSays([flour], "a")[0]).toBe(flour);
+    expect(answerWithAmount([flour], "a", { quantity: 1, unit: "cup" })[0]).toBe(flour);
+  });
+});
+
+describe("what comes back after Finish", () => {
+  it("brings back an ignored question and an estimate nobody confirmed, questions first", () => {
+    const flour = line({ id: "f" });
+    const salt = line({ id: "s", name: "salt", saidWords: "", amount: null, status: "needs-answer" });
+    const eggs = line({ id: "e", name: "eggs", status: "exact", saidWords: "", amount: { quantity: 2, unit: "" } });
+    const questions = questionsFromReading([salt], [], "r1");
+    const back = leftovers([flour, salt, eggs], questions);
+    expect(back.map((item) => item.type)).toEqual(["question", "estimate"]);
+  });
+
+  it("brings back nothing once estimates are confirmed and questions are answered or kept as mom says", () => {
+    const flour = line({ id: "f" });
+    const salt = line({ id: "s", name: "salt", saidWords: "", amount: null, status: "needs-answer" });
+    const questions = questionsFromReading([salt], [], "r1");
+    const settled = keepAsMomsSays(confirmLine([flour, salt], "f"), "s");
+    expect(leftovers(settled, questions)).toEqual([]);
+  });
+
+  it("says there is nothing to finish only when nothing at all was heard", () => {
+    expect(hasNothingToFinish([], [])).toBe(true);
+    expect(hasNothingToFinish([], ["Stir it."])).toBe(false);
+    expect(hasNothingToFinish([line({})], [])).toBe(false);
   });
 });

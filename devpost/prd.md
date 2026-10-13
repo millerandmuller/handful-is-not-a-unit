@@ -19,7 +19,7 @@ Develops `scope.md > The Core Loop`.
 6. When the app is unsure about something it heard, it asks a question. Questions nobody answers during cooking wait in a queue.
 7. When mom is done, the daughter finishes the session. The app shows the questions that were not answered, and she answers or changes them.
 8. She takes a picture of the finished meal.
-9. She sees the completed recipe card: the dish name, the finished meal image, every ingredient with its measurement, and the steps.
+9. She sees the completed recipe card: the dish name, the finished meal image, every ingredient with its measurement (or marked "as mom says"), and the steps.
 
 Success: someone who was not in the kitchen can cook from the card and get the same dish.
 
@@ -99,18 +99,20 @@ Develops a small version of `scope.md > Later` (camera). The camera is used for 
 - Unanswered questions wait in a queue and are shown after she finishes the session.
 - Estimates she neither confirmed nor changed during cooking also join the queue.
 - She can change any answer.
+- When a question comes back at the end for an ingredient and mom cannot give an amount, the daughter has three choices: pick an amount, remove the line, or keep it "as mom says". A line kept "as mom says" stays on the card with the ingredient and mom's own words and no number, and it is not an estimate.
   - [ ] An ingredient said without an amount produces a question, not an invented amount.
   - [ ] A question ignored during cooking is shown again after finishing.
   - [ ] An estimate that was never confirmed is shown again after finishing.
+  - [ ] A question for an ingredient with no amount can be kept "as mom says": the line stays on the card with mom's words and no number, and without an estimate mark.
 
 ### The recipe card
 Develops `scope.md > What "Working" Looks Like`.
 
-- Shows the dish name, the finished meal image, the ingredient list with measurements, and the steps in order.
+- Shows the dish name, the finished meal image, the ingredient list with measurements (or marked "as mom says"), and the steps in order.
 - Next to each converted amount, mom's original words stay visible.
 - Each ingredient shows its picture and its snapped photo if there is one.
 - At the foot of the card is a short note: "The amounts on this card are estimates. Mom's own words are the real recipe. This card is not food-safety advice." Added by the learner at build planning on 2026-10-05.
-  - [ ] Every ingredient on the card has a measurement.
+  - [ ] Every ingredient on the card has a measurement or is marked "as mom says".
   - [ ] No line on the finished card is still marked as an unreviewed estimate.
   - [ ] The note about estimates and food safety is at the foot of every card.
   - [ ] A person who was not in the kitchen can read the card top to bottom and know what to add, how much, and what to do.
@@ -133,7 +135,7 @@ Develops `scope.md > What "Working" Looks Like`.
 - Each line shows what mom said next to what the app converted it to, with images. Learner's choice.
 - Images are a picture of the ingredient plus an optional snapped photo of mom adding it. Small version chosen by the learner: the daughter taps to snap; the app does not choose the moment.
 - When the app is unsure it asks a question, and unanswered questions queue to the end where she can change them. Learner's choice.
-- The session ends with a completed recipe with all measurements and a finished meal image. Learner's choice.
+- The session ends with a completed recipe with all measurements (or marked "as mom says") and a finished meal image. Learner's choice.
 - The look is homemade, mom to daughter, carefully passed on, beautifully designed. Learner's choice.
 
 Proposed by the agent and approved by the learner at review on 2026-10-04:
@@ -180,3 +182,5 @@ Proposed by the agent and approved by the learner at review on 2026-10-04:
 ## Revisions
 
 - 2026-10-13: Every "iPad" now reads "iPhone or iPad", at the owner's decision: the product runs in Safari on an iPhone or an iPad. Wording only; behavior and the proof-of-concept boundary are unchanged.
+- 2026-10-13: At **Finish**, a question for an ingredient mom cannot give an amount for gets a third choice besides picking an amount or removing the line: keep it "as mom says". Changed at the owner's request in `The Core Journey` (step 9), `Questions from the app`, `The recipe card` and `Product Decisions`. The line stays on the card with the ingredient and mom's own words and no number, and is not an estimate. "Every ingredient on the card has a measurement" became "has a measurement or is marked as mom says". The card note is unchanged.
+- 2026-10-13: A line kept at **Finish** shows "as mom says" beside mom's words; with no words from mom it shows "no amount given". Refines the "as mom says" revision above; also in `checklist.md`.

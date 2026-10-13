@@ -1,7 +1,20 @@
-import { redirect } from "next/navigation";
+import Link from "next/link";
 
-// For now the app starts in the session. The recipe list takes this place
-// once naming and the recipe card exist.
 export default function HomePage() {
-  redirect("/session");
+  return (
+    <main className="session">
+      <header className="session__header">
+        <span className="session__mark">Handful</span>
+        <h1 className="session__title">Recipes</h1>
+      </header>
+
+      <p className="empty">
+        No recipes here yet. Tap <strong>New</strong>, prop the screen on the counter, and catch the first one while mom cooks.
+      </p>
+
+      <Link href="/new" className="button button--link">
+        New
+      </Link>
+    </main>
+  );
 }

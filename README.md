@@ -14,8 +14,11 @@ This is a proof of concept built for the Devpost hackathon "Build With AI: Basic
 - Rough amounts ("a handful", "a pinch") become labeled estimates. Exact amounts ("two eggs") appear as said.
 - What mom says about how to cook is kept as steps, in her words.
 - Kitchen talk that is not part of the recipe is ignored.
+- Tap **New**, name the dish, and start. Each estimate has a **Looks right** button, the amount can be changed from a few smaller and larger ones, and any line can be removed.
+- When an ingredient is said with no amount, or with a word the app does not know, the app asks a question instead of guessing. Questions left alone come back after **Finish**, together with any estimate nobody confirmed. For an ingredient mom cannot give an amount for, the choices are to pick an amount, remove the line, or keep it "as mom says": it stays on the card with mom's words and no number. If mom gave no words at all, the line says "no amount given" instead.
+- **Finish** ends with the recipe card: the name, every ingredient with mom's words and its amount, the steps, and a short note that the amounts are estimates.
 
-Still to come: confirming and changing amounts, questions from the app, the finished recipe card, pictures, photos, and the saved recipe list.
+Still to come: pictures for each ingredient, photos, and saving recipes (a finished card is gone when the page is closed for now).
 
 ## How AI was used
 
@@ -40,7 +43,7 @@ Still to come: confirming and changing amounts, questions from the app, the fini
 | Audio | The app never records, saves or sends audio itself. When listening is on, the browser's built-in speech recognition turns the sound into text. In Safari that recognition is provided by Apple and the audio may be processed on Apple's servers; in Chrome it is provided by Google. | Not by this app. |
 | The text of what mom said | From the page to this app's own helper (`/api/understand`), which passes it to Google's Gemini API together with the names of the ingredients already on the list. | Not by this app. The helper keeps nothing. Google's handling depends on the Gemini tier: on the free tier, what is sent may be used to improve Google's products; on the paid tier it is not. |
 | Photos | Not part of the app yet. | No |
-| The recipe in progress | It lives in the page's memory only. | No. Closing or reloading the page loses it. |
+| The recipe in progress and the finished card | It lives in the page's memory only. | No. Closing or reloading the page loses it. Saving finished recipes is still to come. |
 
 There are no accounts and no database. The Gemini key stays on the server and is never part of the page.
 
@@ -59,7 +62,7 @@ Open `.env.local` and put your key after `GEMINI_API_KEY=`. That file is ignored
 npm run dev
 ```
 
-Open http://localhost:3000, type `a handful of flour and two eggs`, and press **Send**.
+Open http://localhost:3000, tap **New**, name the dish, then type `a handful of flour and two eggs` and press **Send**.
 
 Run the automatic checks:
 
@@ -90,7 +93,11 @@ Checked on 2026-10-13, on the hosted address:
 
 | Part | File |
 |---|---|
-| The session screen | `app/session/page.tsx` |
+| The home page and the name screen | `app/page.tsx`, `app/new/page.tsx` |
+| The session screen (listening, questions, finishing) | `app/session/page.tsx` |
+| The rules for lines, questions and what comes back after Finish | `lib/sessionRules.ts` |
+| What a line may show (so an estimate always has its label and mom's words) | `lib/lineDisplay.ts` |
+| The recipe card | `components/RecipeCard.tsx` |
 | The ears (speech to text, restarts itself) | `lib/ears.ts` |
 | The measuring table (rough words to estimates) | `lib/measuringTable.ts` |
 | The helper on the server that holds the key | `app/api/understand/route.ts` |

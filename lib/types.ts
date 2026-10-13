@@ -30,7 +30,8 @@ export type LineStatus =
   | "estimate" // from the measuring table, not yet reviewed
   | "confirmed"
   | "changed"
-  | "needs-answer"; // no trustworthy amount yet
+  | "needs-answer" // no trustworthy amount yet
+  | "as-moms-says"; // kept with mom's words and no number; never an estimate
 
 export interface IngredientLine {
   id: string;

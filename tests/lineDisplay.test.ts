@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { lineDisplay } from "../lib/lineDisplay";
+import { keepButtonLabel, lineDisplay } from "../lib/lineDisplay";
 import { allRoughWords, measureHeard } from "../lib/measuringTable";
 import { changeAmount, confirmLine } from "../lib/sessionRules";
 import type { IngredientLine } from "../lib/types";
@@ -48,5 +48,21 @@ describe("what a line shows", () => {
   it("a line that needs an answer shows no number", () => {
     const needs: IngredientLine = { id: "n", name: "salt", foodGroup: "spice", saidWords: "just a little bit", amount: null, status: "needs-answer" };
     expect(lineDisplay(needs)).toMatchObject({ needsAnswer: true, amountText: null, showEstimateLabel: false, saidWords: "just a little bit" });
+  });
+
+  it("a line kept as mom says shows her words and no number, and is not an estimate", () => {
+    const kept: IngredientLine = { id: "k", name: "salt", foodGroup: "spice", saidWords: "just a little bit", amount: null, status: "as-moms-says" };
+    expect(lineDisplay(kept)).toEqual({ amountText: null, showEstimateLabel: false, needsAnswer: false, asMomsSays: true, noAmountGiven: false, saidWords: "just a little bit" });
+  });
+
+  it("a line kept with no words from mom shows \"no amount given\", not \"as mom says\", and the button says so", () => {
+    const kept: IngredientLine = { id: "c", name: "curry", foodGroup: "spice", saidWords: "  ", amount: null, status: "as-moms-says" };
+    expect(lineDisplay(kept)).toEqual({ amountText: null, showEstimateLabel: false, needsAnswer: false, asMomsSays: false, noAmountGiven: true, saidWords: null });
+    expect(keepButtonLabel({ ...kept, status: "needs-answer" })).toBe("Keep it without an amount");
+  });
+
+  it("the button for a line with mom's words reads \"Keep it as mom says\"", () => {
+    const waiting: IngredientLine = { id: "s", name: "salt", foodGroup: "spice", saidWords: "some", amount: null, status: "needs-answer" };
+    expect(keepButtonLabel(waiting)).toBe("Keep it as mom says");
   });
 });

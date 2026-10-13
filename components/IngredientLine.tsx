@@ -2,24 +2,9 @@
 
 import { useState } from "react";
 import { AmountPicker } from "@/components/AmountPicker";
+import { IngredientTile } from "@/components/IngredientTile";
 import { lineDisplay } from "@/lib/lineDisplay";
-import type { Amount, FoodGroup, IngredientLine as Line } from "@/lib/types";
-
-// The stand-in picture: a colored tile with the ingredient's first letter.
-const TILE_COLOR: Record<FoodGroup, string> = {
-  grain: "mustard",
-  dairy: "delft",
-  egg: "mustard",
-  vegetable: "pandan",
-  fruit: "tomato",
-  meat: "tomato",
-  fish: "delft",
-  spice: "tomato",
-  oil: "mustard",
-  liquid: "delft",
-  sweet: "mustard",
-  other: "pandan",
-};
+import type { Amount, IngredientLine as Line } from "@/lib/types";
 
 interface IngredientLineProps {
   line: Line;
@@ -36,9 +21,7 @@ export function IngredientLine({ line, onConfirm, onChange, onRemove }: Ingredie
 
   return (
     <li className="line line--new">
-      <span className={`tile tile--${TILE_COLOR[line.foodGroup]}`} aria-hidden="true">
-        {line.name.charAt(0)}
-      </span>
+      <IngredientTile name={line.name} foodGroup={line.foodGroup} />
       <div className="line__what">
         <span className="line__name">{line.name}</span>
         {shown.saidWords && <span className="moms-words">{shown.saidWords}</span>}
@@ -54,6 +37,8 @@ export function IngredientLine({ line, onConfirm, onChange, onRemove }: Ingredie
           >
             {shown.amountText}
           </button>
+        ) : shown.asMomsSays || shown.noAmountGiven ? (
+          <span className="line__number line__number--unknown">{shown.asMomsSays ? "as mom says" : "no amount given"}</span>
         ) : (
           <span className="line__number line__number--unknown">amount not known yet</span>
         )}

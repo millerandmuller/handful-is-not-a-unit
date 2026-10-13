@@ -1,15 +1,32 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { IngredientLine } from "@/components/IngredientLine";
+import { LeftoverView } from "@/components/LeftoverView";
 import { ListeningSign } from "@/components/ListeningSign";
+import { QuestionCard } from "@/components/QuestionCard";
+import { RecipeCard } from "@/components/RecipeCard";
 import { TypeOrPasteBox } from "@/components/TypeOrPasteBox";
 import { createEars } from "@/lib/ears";
 import type { Ears, EarsState } from "@/lib/ears";
 import { measureHeard } from "@/lib/measuringTable";
-import { addLines, changeAmount, confirmLine, removeLine } from "@/lib/sessionRules";
+import {
+  addLines,
+  answerQuestion,
+  answerWithAmount,
+  changeAmount,
+  confirmLine,
+  hasNothingToFinish,
+  keepAsMomsSays,
+  leftovers,
+  openQuestions,
+  questionsFromReading,
+  removeLine,
+} from "@/lib/sessionRules";
 import { createPhraseCollector, createUnderstandingQueue, UnderstandingError } from "@/lib/understandingClient";
-import type { Amount, HeardIngredient, IngredientLine as Line } from "@/lib/types";
+import type { Amount, HeardIngredient, HeardQuestion, IngredientLine as Line, Question } from "@/lib/types";
 
 interface FailedText {
   text: string;
@@ -27,8 +44,29 @@ function toLine(heard: HeardIngredient, id: string): Line {
 }
 
 export default function SessionPage() {
+  // useSearchParams needs a Suspense boundary around it for the production build.
+  return (
+    <Suspense fallback={null}>
+      <Session />
+    </Suspense>
+  );
+}
+
+function Session() {
+  const router = useRouter();
+  const name = (useSearchParams().get("name") ?? "").trim();
+
+  // A session cannot start without a name: go and ask for one.
+  useEffect(() => {
+    if (name === "") router.replace("/new");
+  }, [name, router]);
+
   const [lines, setLines] = useState<Line[]>([]);
   const [steps, setSteps] = useState<string[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  // Questions the daughter said "ask me later" to. They all come back after Finish.
+  const [later, setLater] = useState<string[]>([]);
+  const [view, setView] = useState<"cooking" | "finished">("cooking");
   const [reading, setReading] = useState(0);
   const [failed, setFailed] = useState<FailedText | null>(null);
   const [earsState, setEarsState] = useState<EarsState>("off");
@@ -39,6 +77,7 @@ export default function SessionPage() {
   // holds the latest list.
   const latestLines = useRef<Line[]>([]);
   const lineCount = useRef(0);
+  const readingCount = useRef(0);
   const understand = useRef(createUnderstandingQueue()).current;
 
   // Every change to the lines goes through one of the session rules.
@@ -47,12 +86,15 @@ export default function SessionPage() {
     setLines(latestLines.current);
   }
 
-  function addHeard(heard: HeardIngredient[]) {
+  function addHeard(heard: HeardIngredient[], heardQuestions: HeardQuestion[]) {
     const added = heard.map((ingredient) => {
       lineCount.current += 1;
       return toLine(ingredient, `line-${lineCount.current}`);
     });
     updateLines((current) => addLines(current, added));
+    readingCount.current += 1;
+    const asked = questionsFromReading(added, heardQuestions, `q-reading-${readingCount.current}`);
+    setQuestions((current) => [...current, ...asked]);
   }
 
   async function readText(text: string) {
@@ -60,7 +102,7 @@ export default function SessionPage() {
     setReading((count) => count + 1);
     try {
       const answer = await understand(text, () => latestLines.current.map((line) => line.name));
-      addHeard(answer.ingredients);
+      addHeard(answer.ingredients, answer.questions);
       setSteps((current) => [...current, ...answer.steps]);
     } catch (error) {
       // No line is invented. The words are kept so they can be sent again.
@@ -77,8 +119,11 @@ export default function SessionPage() {
   readSpoken.current = readText;
   const ears = useRef<Ears | null>(null);
 
+  const collectorRef = useRef<ReturnType<typeof createPhraseCollector> | null>(null);
+
   useEffect(() => {
     const collector = createPhraseCollector((text) => readSpoken.current(text));
+    collectorRef.current = collector;
     const created = createEars({ onPhrase: collector.add, onHearing: setHearing, onState: setEarsState });
     ears.current = created;
     return () => {
@@ -87,12 +132,107 @@ export default function SessionPage() {
     };
   }, []);
 
+  // Finish stops listening and sends off the last words, so nothing said is left behind.
+  function finish() {
+    ears.current?.stop();
+    collectorRef.current?.flush();
+    setView("finished");
+  }
+
+  function sendAnswerText(questionId: string, text: string) {
+    setQuestions((current) => answerQuestion(current, questionId));
+    readText(text);
+  }
+
+  const pickAmountFor = (id: string, amount: Amount) => updateLines((current) => answerWithAmount(current, id, amount));
+  const confirmLineById = (id: string) => updateLines((current) => confirmLine(current, id));
+  const changeLineAmount = (id: string, amount: Amount) => updateLines((current) => changeAmount(current, id, amount));
+  const removeLineById = (id: string) => updateLines((current) => removeLine(current, id));
+
+  if (name === "") return null;
+
+  const header = (
+    <header className="session__header">
+      <span className="session__mark">Handful</span>
+      <h1 className="session__title">{view === "finished" ? "Almost done" : name}</h1>
+    </header>
+  );
+
+  if (view === "finished") {
+    const items = leftovers(lines, questions);
+
+    if (reading > 0) {
+      return (
+        <main className="session">
+          {header}
+          <p className="status" role="status">
+            Reading mom's last words…
+          </p>
+        </main>
+      );
+    }
+
+    if (hasNothingToFinish(lines, steps)) {
+      return (
+        <main className="session">
+          {header}
+          <div className="notice" role="status">
+            <p>There is nothing to make a card from yet. Mom has not added anything the app could pick up.</p>
+            <div className="notice__actions">
+              <button type="button" className="button" onClick={() => setView("cooking")}>
+                Keep listening
+              </button>
+              <Link href="/" className="button button--quiet button--link">
+                Leave
+              </Link>
+            </div>
+          </div>
+        </main>
+      );
+    }
+
+    if (items.length > 0) {
+      return (
+        <main className="session">
+          {header}
+          <LeftoverView
+            items={items}
+            lines={lines}
+            onConfirm={confirmLineById}
+            onChange={changeLineAmount}
+            onRemove={removeLineById}
+            onAnswerWithAmount={pickAmountFor}
+            onAsMomsSays={(id) => updateLines((current) => keepAsMomsSays(current, id))}
+            onSendText={sendAnswerText}
+            onSkip={(id) => setQuestions((current) => answerQuestion(current, id))}
+            onBack={() => setView("cooking")}
+          />
+        </main>
+      );
+    }
+
+    return (
+      <main className="session">
+        <RecipeCard name={name} ingredients={lines} steps={steps} />
+        <p className="status">This recipe is not saved yet: it is gone when this page is closed.</p>
+        <div className="notice__actions">
+          <button type="button" className="button button--quiet" onClick={() => setView("cooking")}>
+            Back to listening
+          </button>
+          <Link href="/" className="button button--quiet button--link">
+            Home
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  const nextQuestion = openQuestions(lines, questions).find((question) => !later.includes(question.id));
+  const nextQuestionLine = nextQuestion?.lineId ? lines.find((line) => line.id === nextQuestion.lineId) : undefined;
+
   return (
     <main className="session">
-      <header className="session__header">
-        <span className="session__mark">Handful</span>
-        <h1 className="session__title">New recipe</h1>
-      </header>
+      {header}
 
       <ListeningSign
         state={earsState}
@@ -112,17 +252,22 @@ export default function SessionPage() {
         ) : (
           <ul className="lines" aria-live="polite">
             {lines.map((line) => (
-              <IngredientLine
-                key={line.id}
-                line={line}
-                onConfirm={(id) => updateLines((current) => confirmLine(current, id))}
-                onChange={(id: string, amount: Amount) => updateLines((current) => changeAmount(current, id, amount))}
-                onRemove={(id) => updateLines((current) => removeLine(current, id))}
-              />
+              <IngredientLine key={line.id} line={line} onConfirm={confirmLineById} onChange={changeLineAmount} onRemove={removeLineById} />
             ))}
           </ul>
         )}
       </section>
+
+      {nextQuestion && (
+        <QuestionCard
+          key={nextQuestion.id}
+          question={nextQuestion}
+          line={nextQuestionLine}
+          onPick={(amount) => nextQuestionLine && pickAmountFor(nextQuestionLine.id, amount)}
+          onSendText={(text) => sendAnswerText(nextQuestion.id, text)}
+          onLater={() => setLater((current) => [...current, nextQuestion.id])}
+        />
+      )}
 
       {steps.length > 0 && (
         <section aria-labelledby="steps-title">
@@ -161,6 +306,10 @@ export default function SessionPage() {
       )}
 
       <TypeOrPasteBox onSend={readText} />
+
+      <button type="button" className="button button--finish" onClick={finish}>
+        Finish
+      </button>
     </main>
   );
 }

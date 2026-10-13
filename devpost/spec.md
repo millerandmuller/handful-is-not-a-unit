@@ -115,7 +115,7 @@ The rules for what happens to the session: add a line, confirm, change, remove, 
 PRD ref: `prd.md > Confirming or changing an amount`, `prd.md > Questions from the app`.
 
 ### Line display rule
-One small rule that decides what a line shows: the amount text, whether the estimate label is on, and mom's words. The Ingredient line and the Recipe card screen draw only from it, so an estimate is never shown without its label and mom's own words. Pure rule, covered by a named test. Added at build planning on 2026-10-05.
+One small rule that decides what a line shows: the amount text (or "as mom says"), whether the estimate label is on, and mom's words. The Ingredient line and the Recipe card screen draw only from it, so an estimate is never shown without its label and mom's own words. Pure rule, covered by a named test. Added at build planning on 2026-10-05.
 PRD ref: `prd.md > Listening and ingredient lines`, `prd.md > The recipe card`.
 
 ### Ingredient line
@@ -131,7 +131,7 @@ Shows one question with a way to answer it (pick an amount, or type a short answ
 PRD ref: `prd.md > Questions from the app`.
 
 ### Leftover questions screen
-Shown after **Finish**. Walks through unanswered questions and unconfirmed estimates one at a time, then asks for the finished meal photo. If nothing was captured, says so and offers to keep listening or leave.
+Shown after **Finish**. Walks through unanswered questions and unconfirmed estimates one at a time, then asks for the finished meal photo. For an ingredient with no amount the daughter can pick an amount, remove the line, or keep it "as mom says" (the line stays with mom's words and no number). If nothing was captured, says so and offers to keep listening or leave.
 PRD ref: `prd.md > Questions from the app`, `prd.md > States and Boundaries`.
 
 ### Ingredient picture
@@ -143,7 +143,7 @@ Opens the iPhone or iPad camera through the browser's standard photo picker, shr
 PRD ref: `prd.md > Photos`.
 
 ### Recipe card screen
-The finished recipe: name, meal image, ingredients with amounts and mom's words, steps in order, and at the foot the short note "The amounts on this card are estimates. Mom's own words are the real recipe. This card is not food-safety advice."
+The finished recipe: name, meal image, ingredients with amounts (or "as mom says") and mom's words, steps in order, and at the foot the short note "The amounts on this card are estimates. Mom's own words are the real recipe. This card is not food-safety advice."
 PRD ref: `prd.md > The recipe card`.
 
 ### Recipe box (saving)
@@ -162,7 +162,7 @@ PRD ref: `prd.md > Recipe list`, `prd.md > States and Boundaries` (what persists
 - `id`, `name`, `foodGroup`
 - `saidWords`: exactly what mom said, for example "a handful"
 - `amount`: quantity and unit, for example "¼" and "cup"; empty while unknown
-- `status`: `exact` (mom gave a real amount), `estimate` (from the table, not yet reviewed), `confirmed`, `changed`, or `needs-answer`
+- `status`: `exact` (mom gave a real amount), `estimate` (from the table, not yet reviewed), `confirmed`, `changed`, `needs-answer`, or `as-moms-says` (no amount; the line shows mom's own words and no number, and is not an estimate)
 - `photo` (optional image)
 
 **Question**
@@ -315,3 +315,5 @@ const answer = JSON.parse(interaction.output_text);
 - 2026-10-13: Every "iPad" now reads "iPhone or iPad", at the owner's decision: the product runs in Safari on an iPhone or an iPad. The wording was changed in this document, `scope.md`, `prd.md`, `checklist.md` and `README.md`; the design is unchanged.
 - 2026-10-13: The speech service fallback is not needed. Learner check results: on a laptop in Chrome and on an iPhone in Safari, both on the sign-in protected Vercel address, all spoken ingredients appeared as lines and the listening sign did not drop out. Rough words became labeled estimates, and "just a little bit" became "needs an answer". The built-in speech recognition stays the only way of listening, with the typing box as the last resort. The Gemini audio path described under External Services stays unused.
 - 2026-10-13: The demo video is recorded from the laptop. A laptop screen recording with listening on captured both the screen and the audio. On the iPhone, a Control Center recording with the microphone on lost its audio as soon as **Start listening** was tapped, because the microphone went to the app; the app kept capturing words. This replaces the iPhone or iPad recording plan in `Where It Runs and How Someone Tries It`.
+- 2026-10-13: A fifth line status, `as-moms-says`, was added to `Data Model`, and the `Leftover questions screen`, `Recipe card screen` and `Line display rule` components were changed to match the PRD revision of the same date: at **Finish** the daughter may keep an ingredient with no amount "as mom says" instead of picking an amount or removing it. No number is shown for such a line and it is never an estimate.
+- 2026-10-13: A line kept at **Finish** shows "as mom says" beside mom's words; with no words from mom it shows "no amount given". Refines the "as mom says" revision above; also in `checklist.md`.

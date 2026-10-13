@@ -109,3 +109,10 @@ export function leftovers(lines: IngredientLine[], questions: Question[]): Lefto
 export function hasNothingToFinish(lines: IngredientLine[], steps: string[]): boolean {
   return lines.length === 0 && steps.length === 0;
 }
+
+// ---- Photos ----
+
+/** Attach a photo (already shrunk) to a line. Taking another one replaces it. */
+export function attachPhoto(lines: IngredientLine[], id: string, photo: string): IngredientLine[] {
+  return updateLine(lines, id, (line) => ({ ...line, photo }));
+}

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { IngredientLine } from "@/components/IngredientLine";
 import { LeftoverView } from "@/components/LeftoverView";
+import { MealPrompt } from "@/components/MealPrompt";
 import { ListeningSign } from "@/components/ListeningSign";
 import { QuestionCard } from "@/components/QuestionCard";
 import { RecipeCard } from "@/components/RecipeCard";
@@ -17,6 +18,7 @@ import type { SaveResult } from "@/lib/recipeBox";
 import {
   addLines,
   answerQuestion,
+  attachPhoto,
   answerWithAmount,
   changeAmount,
   confirmLine,
@@ -76,6 +78,10 @@ function Session() {
   // Questions the daughter said "ask me later" to. They all come back after Finish.
   const [later, setLater] = useState<string[]>([]);
   const [view, setView] = useState<"cooking" | "finished">("cooking");
+  // Photos stay on this device. A camera problem is shown as one notice; the photo buttons keep working.
+  const [mealPhoto, setMealPhoto] = useState<string | undefined>();
+  const [mealDone, setMealDone] = useState(false);
+  const [cameraProblem, setCameraProblem] = useState<string | null>(null);
   const [saved, setSaved] = useState<SaveResult | "saving" | null>(null);
   // One id for the whole session, so finishing twice replaces the recipe instead of adding a second.
   const recipeId = useRef<string | null>(null);
@@ -156,20 +162,31 @@ function Session() {
     readText(text);
   }
 
+  const photos = {
+    onPhoto: (id: string, photo: string) => updateLines((current) => attachPhoto(current, id, photo)),
+    onCameraProblem: setCameraProblem,
+  };
+  const cameraNotice = cameraProblem && (
+    <div className="notice" role="status">
+      <p>{cameraProblem}</p>
+    </div>
+  );
+
   const pickAmountFor = (id: string, amount: Amount) => updateLines((current) => answerWithAmount(current, id, amount));
   const confirmLineById = (id: string) => updateLines((current) => confirmLine(current, id));
   const changeLineAmount = (id: string, amount: Amount) => updateLines((current) => changeAmount(current, id, amount));
   const removeLineById = (id: string) => updateLines((current) => removeLine(current, id));
 
   const items = leftovers(lines, questions);
-  const cardReady = view === "finished" && reading === 0 && !hasNothingToFinish(lines, steps) && items.length === 0;
+  const questionsDone = view === "finished" && reading === 0 && !hasNothingToFinish(lines, steps) && items.length === 0;
+  const cardReady = questionsDone && mealDone;
 
   // The card is the end of the session: keep the recipe on this device.
   useEffect(() => {
     if (!cardReady) return;
     recipeId.current ??= crypto.randomUUID();
     setSaved("saving");
-    saveRecipe({ id: recipeId.current, name, finishedAt: new Date().toISOString(), ingredients: lines, steps }).then(setSaved);
+    saveRecipe({ id: recipeId.current, name, finishedAt: new Date().toISOString(), ingredients: lines, steps, mealPhoto }).then(setSaved);
     // lines, steps and name are settled once the card is ready; saving again on every render would repeat it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardReady]);
@@ -234,9 +251,24 @@ function Session() {
       );
     }
 
+    if (!mealDone) {
+      return (
+        <main className="session">
+          {header}
+          {cameraNotice}
+          <MealPrompt
+            photo={mealPhoto}
+            onPhoto={setMealPhoto}
+            onCameraProblem={setCameraProblem}
+            onDone={() => setMealDone(true)}
+          />
+        </main>
+      );
+    }
+
     return (
       <main className="session">
-        <RecipeCard name={name} ingredients={lines} steps={steps} />
+        <RecipeCard name={name} ingredients={lines} steps={steps} mealPhoto={mealPhoto} />
         <p className="status" role="status">
           {SAVE_MESSAGE[saved ?? "saving"]}
         </p>
@@ -258,6 +290,7 @@ function Session() {
   return (
     <main className="session">
       {header}
+      {cameraNotice}
 
       <ListeningSign
         state={earsState}
@@ -277,7 +310,7 @@ function Session() {
         ) : (
           <ul className="lines" aria-live="polite">
             {lines.map((line) => (
-              <IngredientLine key={line.id} line={line} onConfirm={confirmLineById} onChange={changeLineAmount} onRemove={removeLineById} />
+              <IngredientLine key={line.id} line={line} onConfirm={confirmLineById} onChange={changeLineAmount} onRemove={removeLineById} photos={photos} />
             ))}
           </ul>
         )}

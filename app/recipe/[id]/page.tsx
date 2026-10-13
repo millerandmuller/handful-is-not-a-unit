@@ -25,7 +25,7 @@ export default function SavedRecipePage() {
   return (
     <main className="session">
       {loaded.state === "found" ? (
-        <RecipeCard name={loaded.recipe.name} ingredients={loaded.recipe.ingredients} steps={loaded.recipe.steps} />
+        <RecipeCard name={loaded.recipe.name} ingredients={loaded.recipe.ingredients} steps={loaded.recipe.steps} mealPhoto={loaded.recipe.mealPhoto} />
       ) : (
         <p className="empty">This recipe is not on this device. It may have been saved on another one, or the browser's saved data was cleared.</p>
       )}

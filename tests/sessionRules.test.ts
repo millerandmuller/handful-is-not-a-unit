@@ -3,6 +3,7 @@ import {
   addLines,
   answerQuestion,
   answerWithAmount,
+  attachPhoto,
   changeAmount,
   confirmLine,
   hasNothingToFinish,
@@ -176,5 +177,18 @@ describe("what comes back after Finish", () => {
     expect(hasNothingToFinish([], [])).toBe(true);
     expect(hasNothingToFinish([], ["Stir it."])).toBe(false);
     expect(hasNothingToFinish([line({})], [])).toBe(false);
+  });
+});
+
+describe("photos on lines", () => {
+  it("attaches a photo to one line and keeps everything else about it", () => {
+    const result = attachPhoto([line({ id: "a" }), line({ id: "b" })], "b", "data:image/jpeg;base64,AAAA");
+    expect(result[1]).toMatchObject({ photo: "data:image/jpeg;base64,AAAA", status: "estimate", saidWords: "a handful" });
+    expect(result[0].photo).toBeUndefined();
+  });
+
+  it("taking another photo replaces the first", () => {
+    const once = attachPhoto([line({})], "a", "first");
+    expect(attachPhoto(once, "a", "second")[0].photo).toBe("second");
   });
 });

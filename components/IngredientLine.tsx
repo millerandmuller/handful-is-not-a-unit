@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AmountPicker } from "@/components/AmountPicker";
 import { IngredientPicture } from "@/components/IngredientPicture";
+import { PhotoButton } from "@/components/PhotoButton";
 import { lineDisplay } from "@/lib/lineDisplay";
 import type { Amount, IngredientLine as Line } from "@/lib/types";
 
@@ -11,10 +12,12 @@ interface IngredientLineProps {
   onConfirm: (id: string) => void;
   onChange: (id: string, amount: Amount) => void;
   onRemove: (id: string) => void;
+  /** Photos are optional: without these, the line has no camera button. */
+  photos?: { onPhoto: (id: string, photo: string) => void; onCameraProblem: (message: string) => void };
 }
 
 /** One row: picture, ingredient, mom's own words, the amount, and what can be done with it. */
-export function IngredientLine({ line, onConfirm, onChange, onRemove }: IngredientLineProps) {
+export function IngredientLine({ line, onConfirm, onChange, onRemove, photos }: IngredientLineProps) {
   const [picking, setPicking] = useState(false);
   // Everything shown about the amount comes from lineDisplay, nothing is decided here.
   const shown = lineDisplay(line);
@@ -47,6 +50,15 @@ export function IngredientLine({ line, onConfirm, onChange, onRemove }: Ingredie
       </div>
 
       <div className="line__actions">
+        {line.photo && /* eslint-disable-next-line @next/next/no-img-element */ <img className="line__photo" src={line.photo} alt={`${line.name} being added`} />}
+        {photos && (
+          <PhotoButton
+            quiet
+            label={line.photo ? "Retake photo" : "Photo"}
+            onPhoto={(photo) => photos.onPhoto(line.id, photo)}
+            onCameraProblem={photos.onCameraProblem}
+          />
+        )}
         {shown.showEstimateLabel && (
           <button type="button" className="button" onClick={() => onConfirm(line.id)}>
             Looks right

@@ -670,3 +670,45 @@ input {
   font-weight: 700;
   white-space: nowrap;
 }
+
+/* ---- Photos ---- */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.line__photo {
+  width: var(--tap);
+  height: var(--tap);
+  object-fit: cover;
+  border-radius: 12px;
+  margin-right: auto;
+}
+.photo__failed {
+  color: var(--tomato);
+  font-weight: 700;
+  align-self: center;
+}
+.meal__preview {
+  width: 100%;
+  max-width: 420px;
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+.card__meal {
+  width: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.card__photo {
+  margin-top: 0.4rem;
+  width: 96px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 10px;
+}

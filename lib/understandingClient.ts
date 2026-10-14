@@ -8,6 +8,9 @@ const ATTEMPTS = 2; // the first try, then one retry
 
 export class UnderstandingError extends Error {}
 
+/** A refusal that trying again cannot change, so it is never retried. */
+export class UnderstandingRefused extends UnderstandingError {}
+
 export type SendToHelper = (request: UnderstandRequest) => Promise<UnderstandAnswer>;
 
 /** One call to the helper. Throws an UnderstandingError with a plain message. */
@@ -39,6 +42,7 @@ async function sendWithRetry(send: SendToHelper, request: UnderstandRequest): Pr
     try {
       return await send(request);
     } catch (error) {
+      if (error instanceof UnderstandingRefused) throw error;
       lastError = error;
     }
   }

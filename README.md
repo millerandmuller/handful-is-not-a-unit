@@ -45,12 +45,13 @@ This is a proof of concept built for the Devpost hackathon "Build With AI: Basic
 | What | Where it goes | Is it stored? |
 |---|---|---|
 | Audio | The app never records, saves or sends audio itself. When listening is on, the browser's built-in speech recognition turns the sound into text. In Safari that recognition is provided by Apple and the audio may be processed on Apple's servers; in Chrome it is provided by Google. | Not by this app. |
+| Anything typed or said in demo mode (the default) | Nowhere. Demo mode replays three recorded Gemini answers for three sample sentences, in the page, with no network request at all. Anything else is refused on the page. | No. |
 | The text of what mom said | From the page to this app's own helper (`/api/understand`), which passes it to Google's Gemini API together with the names of the ingredients already on the list. | Not by this app. The helper keeps nothing. Google's handling depends on the Gemini tier: on the free tier, what is sent may be used to improve Google's products; on the paid tier it is not. |
 | Photos | Taken through the browser's own photo picker, shrunk on the device to at most 800 pixels on the longest side, and kept only in the browser's storage on that device, with the recipe. **A photo is never sent to the app's helper, to Gemini, or to any server.** The only thing the page sends out is the text of what mom said and the names of the ingredients already listed. | Yes, on that device only, with the recipe. |
 | The recipe in progress | It lives in the page's memory only. | No. Closing or reloading the page loses it. |
 | A finished recipe | It is saved in the browser's own storage (IndexedDB) on the device that made it. It is never sent to a server. | Yes, on that device only, until the browser's website data is cleared. |
 
-There are no accounts and no server-side database. The Gemini key stays on the server and is never part of the page.
+There are no accounts and no server-side database. The Gemini key stays on the server and is never part of the page, and the helper that uses it answers only requests that carry the access code.
 
 ## How to run it
 

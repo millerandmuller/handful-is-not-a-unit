@@ -1,6 +1,7 @@
 // The helper on the server. It exists to keep the Gemini key out of the page.
 // The page sends mom's words here; this passes them to Gemini and checks the answer.
 
+import { ACCESS_CODE_HEADER, isAccessCodeAccepted } from "@/lib/server/accessCode";
 import { askGemini, MissingKeyError } from "@/lib/server/gemini";
 import { checkAnswer, UnusableAnswerError } from "@/lib/server/checkAnswer";
 import { MAX_TEXT_LENGTH } from "@/lib/types";
@@ -32,6 +33,11 @@ function readRequest(body: unknown): UnderstandRequest | string {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  // The code is checked before the body is even read, and before anything can reach Gemini.
+  if (!isAccessCodeAccepted(request.headers.get(ACCESS_CODE_HEADER), process.env.JUDGE_ACCESS_CODE)) {
+    return refuse("An access code is needed to use the helper.", 401);
+  }
+
   let body: unknown;
   try {
     body = await request.json();

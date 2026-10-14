@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
+import { AccessCodeField } from "@/components/AccessCodeField";
 import { DemoBanner } from "@/components/DemoBanner";
 import { IngredientLine } from "@/components/IngredientLine";
 import { LeftoverView } from "@/components/LeftoverView";
@@ -11,7 +12,7 @@ import { ListeningSign } from "@/components/ListeningSign";
 import { QuestionCard } from "@/components/QuestionCard";
 import { RecipeCard } from "@/components/RecipeCard";
 import { TypeOrPasteBox } from "@/components/TypeOrPasteBox";
-import { sendDemo } from "@/lib/demoUnderstanding";
+import { getAccessCode } from "@/lib/accessCode";
 import { createEars } from "@/lib/ears";
 import type { Ears, EarsState } from "@/lib/ears";
 import { measureHeard } from "@/lib/measuringTable";
@@ -31,7 +32,8 @@ import {
   questionsFromReading,
   removeLine,
 } from "@/lib/sessionRules";
-import { createPhraseCollector, createUnderstandingQueue, UnderstandingError, UnderstandingRefused } from "@/lib/understandingClient";
+import { CodeNotAccepted, createPhraseCollector, createUnderstandingQueue, UnderstandingError, UnderstandingRefused } from "@/lib/understandingClient";
+import { sendByMode } from "@/lib/understandingMode";
 import type { Amount, HeardIngredient, HeardQuestion, IngredientLine as Line, Question } from "@/lib/types";
 
 interface FailedText {
@@ -93,6 +95,9 @@ function Session() {
   const [failed, setFailed] = useState<FailedText | null>(null);
   const [earsState, setEarsState] = useState<EarsState>("off");
   const [hearing, setHearing] = useState("");
+  // Demo mode (recorded answers) until a right access code is stored for this tab.
+  const [unlocked, setUnlocked] = useState(false);
+  useEffect(() => setUnlocked(getAccessCode() !== null), []);
 
   // The queue reads the ingredient names at the moment a request is sent,
   // which can be before React has drawn the newest lines. This ref always
@@ -100,7 +105,7 @@ function Session() {
   const latestLines = useRef<Line[]>([]);
   const lineCount = useRef(0);
   const readingCount = useRef(0);
-  const understand = useRef(createUnderstandingQueue(sendDemo)).current;
+  const understand = useRef(createUnderstandingQueue(sendByMode)).current;
 
   // Every change to the lines goes through one of the session rules.
   function updateLines(rule: (current: Line[]) => Line[]) {
@@ -128,6 +133,7 @@ function Session() {
       setSteps((current) => [...current, ...answer.steps]);
     } catch (error) {
       // No line is invented. The words are kept so they can be sent again.
+      if (error instanceof CodeNotAccepted) setUnlocked(false);
       const message = error instanceof UnderstandingError ? error.message : "I couldn't understand that.";
       setFailed({ text, message, canRetry: !(error instanceof UnderstandingRefused) });
     } finally {
@@ -296,7 +302,8 @@ function Session() {
       {header}
       {cameraNotice}
 
-      <DemoBanner onSample={readText} />
+      {!unlocked && <DemoBanner onSample={readText} />}
+      <AccessCodeField unlocked={unlocked} onUnlocked={() => setUnlocked(true)} onLocked={() => setUnlocked(false)} />
 
       <ListeningSign
         state={earsState}

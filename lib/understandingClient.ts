@@ -1,6 +1,7 @@
 // Sends mom's words to the helper on the server, one request at a time, so
 // each request can tell the helper which ingredients are already on the list.
 
+import { ACCESS_CODE_HEADER, clearAccessCode, getAccessCode } from "./accessCode";
 import type { UnderstandAnswer, UnderstandRequest } from "./types";
 
 const REQUEST_TIMEOUT_MS = 25_000;
@@ -11,20 +12,32 @@ export class UnderstandingError extends Error {}
 /** A refusal that trying again cannot change, so it is never retried. */
 export class UnderstandingRefused extends UnderstandingError {}
 
+/** The helper said the access code is wrong. The page goes back to demo mode. */
+export class CodeNotAccepted extends UnderstandingRefused {}
+
 export type SendToHelper = (request: UnderstandRequest) => Promise<UnderstandAnswer>;
 
 /** One call to the helper. Throws an UnderstandingError with a plain message. */
 export async function sendToHelper(request: UnderstandRequest): Promise<UnderstandAnswer> {
+  const code = getAccessCode();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (code) headers[ACCESS_CODE_HEADER] = code;
+
   let response: Response;
   try {
     response = await fetch("/api/understand", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(request),
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
   } catch {
     throw new UnderstandingError("I couldn't reach the helper. Check the internet connection.");
+  }
+
+  if (response.status === 401) {
+    clearAccessCode();
+    throw new CodeNotAccepted("That code was not accepted.");
   }
 
   const body: unknown = await response.json().catch(() => null);

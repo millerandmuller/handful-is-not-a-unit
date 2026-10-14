@@ -748,3 +748,42 @@ input {
   border-radius: var(--radius);
   padding-block: 0.75rem;
 }
+
+/* ---- Access code ---- */
+
+.access {
+  font-size: 1rem;
+}
+.access summary {
+  cursor: pointer;
+  color: var(--delft);
+  font-weight: 700;
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+}
+.access__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+.access__row .typebox__label {
+  flex-basis: 100%;
+}
+.access__message {
+  margin: 0.5rem 0 0;
+  color: var(--tomato);
+  font-weight: 700;
+}
+.access--on {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.access--on p {
+  margin: 0;
+}

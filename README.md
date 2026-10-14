@@ -26,7 +26,7 @@ This is a proof of concept built for the Devpost hackathon "Build With AI: Basic
 
 ## How AI was used
 
-**To build it.** The owner is not a programmer. She made the product decisions (what the app does, what it must never do, what to cut) and reviewed each step by trying it. The code, tests and this README were written by Claude Code, Anthropic's AI coding agent, under her direction.
+**To build it.** The owner is not a programmer. She made the product decisions (what the app does, what it must not do, what to cut) and reviewed each step by trying it. The code, tests and this README were written by Claude Code, Anthropic's AI coding agent, under her direction.
 
 **While it runs.** Google's Gemini (`gemini-3.8-flash`) reads the text of what mom said and picks out ingredients, her amount words, and steps. That is all the AI does.
 

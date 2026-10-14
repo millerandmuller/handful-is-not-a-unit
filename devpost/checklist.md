@@ -79,7 +79,7 @@ Build mode: learn for slices 1 to 4, then fast for the three extras (slices 5 to
   Learner check: Finish a recipe on the iPhone or iPad, close Safari completely, open the address again, and tap the recipe in the list. Is it the same card you saw at the end?
   Commit: `Save finished recipes and list them on the home page`
 
-- [ ] **8. Judges can use the hosted app without spending the Gemini key**
+- [x] **8. Judges can use the hosted app without spending the Gemini key**
   Becomes usable: The session screen opens in demo mode: three sample sentences replay recorded Gemini answers under a banner that says so, and nothing typed or said is sent anywhere. A collapsed "Have an access code?" field unlocks the real helper when the right code is entered. The helper refuses every request without the right code, and refuses all of them when no code is configured.
   Why now: Added after the feature freeze, at the owner's request (see Revisions). The hosted app sits behind a Vercel sign-in, so judges cannot use it, and opening it without a gate would let anyone spend the owner's Gemini quota.
   PRD ref: none (access for judges is not part of the product's journey)
@@ -135,3 +135,4 @@ Activity mode: Recap. Map: `devpost/app-map.html` (static page, no scripts; its 
 - 2026-10-13: Feature freeze moved by the owner from Friday 2026-10-17 evening to 2026-10-13. All seven slices are built and committed. From here: the final review, bug fixes, wording, and the ship steps; no new features.
 - 2026-10-14: Wording change at the owner's request: the sentence saying the owner holds both a Claude API account and a Gemini key was removed from `spec.md > Agent's recommendations` (dated revision note in `spec.md`). No behavior change.
 - 2026-10-14: Feature freeze reopened by the owner for slice 8 only (demo mode and a judge access code); nothing else changes. BYOK (visitors bringing their own Gemini key) was left out on purpose: it would break the README promise that the key never leaves the server. The first part, demo mode, was committed as `Add demo mode with recorded answers for sample sentences`, and "Try again" is hidden when the helper refuses the text outright (`Hide Try again when the helper refuses the text outright`).
+- 2026-10-14: Slice 8 deployed and checked. Production at `handful-is-not-a-unit.vercel.app` (public without a Vercel sign-in: Vercel leaves the production address open and protects the other addresses). Anonymous requests to `/api/understand` get 401 with no code and with a wrong code; the right code works (checked on the preview with an empty request, and in a browser with one real sentence). Remaining and not code: a Vercel Firewall rate limit and a Google AI Studio quota or spend cap, both done by the owner in dashboards.

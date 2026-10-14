@@ -31,12 +31,14 @@ import {
   questionsFromReading,
   removeLine,
 } from "@/lib/sessionRules";
-import { createPhraseCollector, createUnderstandingQueue, UnderstandingError } from "@/lib/understandingClient";
+import { createPhraseCollector, createUnderstandingQueue, UnderstandingError, UnderstandingRefused } from "@/lib/understandingClient";
 import type { Amount, HeardIngredient, HeardQuestion, IngredientLine as Line, Question } from "@/lib/types";
 
 interface FailedText {
   text: string;
   message: string;
+  // A refusal (such as demo mode) would be refused again, so "Try again" is not offered.
+  canRetry: boolean;
 }
 
 function toLine(heard: HeardIngredient, id: string): Line {
@@ -127,7 +129,7 @@ function Session() {
     } catch (error) {
       // No line is invented. The words are kept so they can be sent again.
       const message = error instanceof UnderstandingError ? error.message : "I couldn't understand that.";
-      setFailed({ text, message });
+      setFailed({ text, message, canRetry: !(error instanceof UnderstandingRefused) });
     } finally {
       setReading((count) => count - 1);
     }
@@ -357,9 +359,11 @@ function Session() {
             <span className="moms-words">{failed.text}</span>
           </p>
           <div className="notice__actions">
-            <button type="button" className="button" onClick={() => readText(failed.text)}>
-              Try again
-            </button>
+            {failed.canRetry && (
+              <button type="button" className="button" onClick={() => readText(failed.text)}>
+                Try again
+              </button>
+            )}
             <button type="button" className="button button--quiet" onClick={() => setFailed(null)}>
               Leave it out
             </button>

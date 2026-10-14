@@ -83,23 +83,25 @@ Build mode: learn for slices 1 to 4, then fast for the three extras (slices 5 to
 
 - [x] Early usable behavior explored — after slice 2: the three-run kitchen listening test on the iPhone or iPad, which decides whether the speech service fallback is needed, plus the screen recording test with the microphone on, which decides how the demo video is recorded
 - [x] Integrated core journey explored — after slice 4: name to finished card, before the three extras, and the point to decide whether any extra is cut
-- [ ] Final kick-the-tires exploration and feedback completed
+- [x] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [x] Final review complete — feedback resolved and learner confirms ready to ship
+
+Outcome 2026-10-14: the owner's tires-kicking found no bugs (ingredients and instructions in the same recipe handled properly; a very long dish name was accepted with no wrapping or cut-off problem). One wording fix was requested in `spec.md` (see Revisions). The owner then asked to run the learning wrap-up and hand off to `6-ship`, which is recorded as the confirmation that the proof of concept is ready.
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [x] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: [what actually happened; real document/test/code references; unfinished work if interrupted]
-Route and stops: [actual paths and symbols; guided stops completed, or reference-only route]
-Edit outcome: [tried/kept/reverted/declined/not applicable; verification if changed]
-Reflection: [offered/answered/declined/already covered — personal answer belongs only in the ignored profile]
-Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
+Activity and evidence: Brief recap, not a live tour. The connection chosen: the AI reads, a fixed table measures. Evidence: `spec.md` (the fixed measuring table), `lib/measuringTable.ts`, and the test "two handfuls is half a cup" in `tests/measuringTable.test.ts`; the full suite (96 tests) passes.
+Route and stops: Reference-only route, not toured live: `createPhraseCollector` in `lib/understandingClient.ts`; `app/api/understand/route.ts` with `askGemini` and `checkAnswer`, then `measureHeard` in `lib/measuringTable.ts`; `addHeard` and `saveRecipe` in `app/session/page.tsx` and `lib/recipeBox.ts`. All symbols were checked against the source.
+Edit outcome: Not tried. The owner asked to go straight to shipping.
+Reflection: Offered once in the hand-off message; any answer belongs only in the ignored profile.
+Activity mode: Recap. Map: `devpost/app-map.html` (static page, no scripts; its structure and source anchors were checked, but it was not opened in a browser by the agent).
 
 ## Revisions
 
@@ -120,3 +122,5 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 - 2026-10-13: Slice 7 saves through an injectable storage (`RecipeStorage` in `lib/recipeBox.ts`) so the rules, including "saved without photos" when a photo does not fit, are tested without a browser; `idb-keyval` is the browser storage behind it. The saving rules already handle photos so slice 6 only has to attach them. A recipe has one id for the whole session, so finishing again replaces it. The "not saved yet" line under the finished card is replaced by the result of saving. `app/page.tsx` is now a client page that reads the box.
 - 2026-10-13: Slice 6 conditions set by the owner: photos stay on the device, stored with the recipe, and are never sent to the helper, Gemini or any server (said in the README table); the camera is asked for only when a photo button is tapped, never on page load; a camera that is refused or missing is told once and every photo button then turns off; a card with no photos stays complete, and is tested; photos are shrunk to at most 800 pixels on the longest side (JPEG, quality 0.7) before saving. How the camera check works: `lib/photo.ts` asks the browser only what it already knows (the camera permission state, and the list of devices) and says "turned off" only when the browser reports denied and "no camera" only when devices are listed and none is a camera; it never opens the camera. Limit: with the browser's photo picker, a person who simply cancels the camera looks the same as no photo, and iOS asks for the camera itself inside its own camera screen, so a refusal there cannot be detected by the page. The finished-meal step (`components/MealPrompt.tsx`) is its own screen after the questions rather than part of the leftover questions view.
 - 2026-10-13: Slice 6 changed after the owner's phone check failed: tapping **Photo** opened nothing on the iPhone, in Safari or Chrome, and showed no notice. Cause: `tapped()` in `components/PhotoButton.tsx` awaited the camera check before opening the picker, and iPhone and iPad drop a file picker that is opened after an await. Fix: the picker now opens inside the tap with nothing awaited before it, and the camera check runs afterwards only to show a notice (`openPickerThenCheck` in `lib/photo.ts`, with a test that the picker is called before anything is awaited). This replaces part of the earlier slice 6 note: a camera that is turned off or missing now shows one notice and the photo buttons stay usable instead of switching off, because the picker cannot be stopped from opening and still allows a photo from the library. The other conditions stand: photos stay on the device, the camera is asked for only on a tap, and a card with no photos is complete. My earlier laptop checks passed because laptop Chrome allows a picker opened after an await.
+- 2026-10-13: Feature freeze moved by the owner from Friday 2026-10-17 evening to 2026-10-13. All seven slices are built and committed. From here: the final review, bug fixes, wording, and the ship steps; no new features.
+- 2026-10-14: Wording change at the owner's request: the sentence saying the owner holds both a Claude API account and a Gemini key was removed from `spec.md > Agent's recommendations` (dated revision note in `spec.md`). No behavior change.

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handful App Map</title>
+<style>
+  :root { --bg:#fbf6ee; --ink:#2b2118; --muted:#6b5a4a; --card:#fffdf8; --line:#e2d3bd; --accent:#a8472a; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#1d1813; --ink:#f1e8da; --muted:#bba98f; --card:#27211a; --line:#443a2d; --accent:#e08a67; }
+  }
+  body { margin:0; background:var(--bg); color:var(--ink); font:17px/1.55 Georgia, "Times New Roman", serif; }
+  main { max-width:760px; margin:0 auto; padding:24px 16px 56px; }
+  h1 { font-size:1.9rem; margin:0 0 4px; }
+  h2 { font-size:1.25rem; margin:32px 0 8px; color:var(--accent); }
+  p, li { margin:6px 0; }
+  .sub { color:var(--muted); margin:0 0 16px; }
+  code { font:0.9em ui-monospace, Menlo, monospace; background:var(--card); border:1px solid var(--line); border-radius:4px; padding:1px 5px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 16px; margin:10px 0; }
+  svg { width:100%; height:auto; display:block; }
+  svg text { fill:var(--ink); font:13px Georgia, serif; }
+  svg .box { fill:var(--card); stroke:var(--line); stroke-width:1.5; }
+  svg .hot { fill:var(--card); stroke:var(--accent); stroke-width:2; }
+  svg .arrow { stroke:var(--accent); stroke-width:2; fill:none; }
+  details { margin:8px 0; }
+  summary { cursor:pointer; font-weight:bold; }
+  summary:focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+  table { border-collapse:collapse; width:100%; }
+  td, th { text-align:left; vertical-align:top; padding:6px 8px; border-bottom:1px solid var(--line); }
+</style>
+</head>
+<body>
+<main>
+<h1>Handful App Map</h1>
+<p class="sub">A reference map of the finished proof of concept. Snapshot of commit <code>582c919</code> plus the final wording edits. Code can drift from this page over time.</p>
+
+<h2>What the app is</h2>
+<p>Handful listens while a parent talks through a family recipe and turns rough amounts ("a handful of flour") into a recipe card a child can cook from. Mom's own words always stay next to the app's estimate. There are four main pieces:</p>
+<ul>
+  <li><strong>Ears</strong> (in the browser): the built-in speech recognition, with a typing box as the last resort.</li>
+  <li><strong>Helper</strong> (on the server): sends the words to Gemini, which only reads and sorts them. It never produces a converted amount.</li>
+  <li><strong>Measuring table</strong>: the one fixed table where a rough word becomes a number.</li>
+  <li><strong>Recipe box</strong>: finished recipes and their photos, kept in this browser only.</li>
+</ul>
+
+<h2>One action, from voice to card</h2>
+<div class="card">
+<svg viewBox="0 0 720 150" role="img" aria-labelledby="dt dd">
+  <title id="dt">Flow from speech to recipe card</title>
+  <desc id="dd">Mom speaks, the phrase collector groups the words, the helper asks Gemini, the measuring table converts the rough word, the line appears in the session, and Finish saves the recipe to the recipe box.</desc>
+  <rect class="box" x="4" y="50" width="100" height="50" rx="8"/><text x="54" y="72" text-anchor="middle">Mom says</text><text x="54" y="89" text-anchor="middle">"a handful"</text>
+  <rect class="box" x="130" y="50" width="100" height="50" rx="8"/><text x="180" y="72" text-anchor="middle">Phrase</text><text x="180" y="89" text-anchor="middle">collector</text>
+  <rect class="box" x="256" y="50" width="100" height="50" rx="8"/><text x="306" y="72" text-anchor="middle">Helper +</text><text x="306" y="89" text-anchor="middle">Gemini reads</text>
+  <rect class="hot" x="382" y="50" width="100" height="50" rx="8"/><text x="432" y="72" text-anchor="middle">Measuring</text><text x="432" y="89" text-anchor="middle">table: &#188; cup</text>
+  <rect class="box" x="508" y="50" width="100" height="50" rx="8"/><text x="558" y="72" text-anchor="middle">Line appears</text><text x="558" y="89" text-anchor="middle">(estimate)</text>
+  <rect class="box" x="624" y="50" width="92" height="50" rx="8"/><text x="670" y="72" text-anchor="middle">Finish:</text><text x="670" y="89" text-anchor="middle">saved card</text>
+  <path class="arrow" d="M104 75 H130 M230 75 H256 M356 75 H382 M482 75 H508 M608 75 H624"/>
+  <text x="360" y="130" text-anchor="middle">The recipe is stored on the device. Photos never leave it.</text>
+</svg>
+</div>
+
+<h2>A reference route (not toured live)</h2>
+<ol>
+  <li><strong>Where the words are grouped.</strong> <code>lib/understandingClient.ts</code>, search <code>createPhraseCollector</code>. It waits for about a second of silence so an amount and its ingredient arrive together.</li>
+  <li><strong>Where the answer is checked and measured.</strong> <code>app/api/understand/route.ts</code> calls <code>askGemini</code> (<code>lib/server/gemini.ts</code>) and then <code>checkAnswer</code> (<code>lib/server/checkAnswer.ts</code>). In the browser, <code>measureHeard</code> in <code>lib/measuringTable.ts</code> turns "handful" into &#188; cup.</li>
+  <li><strong>Where it shows and is saved.</strong> <code>app/session/page.tsx</code>, search <code>addHeard</code> for the new line and <code>saveRecipe</code> for Finish. <code>lib/recipeBox.ts</code> writes to the browser's IndexedDB.</li>
+</ol>
+
+<h2>To change this, start here</h2>
+<table>
+  <tr><th>Want to change</th><th>Start in</th></tr>
+  <tr><td>What a "handful" or "pinch" equals</td><td><code>lib/measuringTable.ts</code> (the table near <code>"handful"</code>); its test is <code>tests/measuringTable.test.ts</code></td></tr>
+  <tr><td>What Gemini is told to do</td><td><code>lib/server/instructions.ts</code></td></tr>
+  <tr><td>How an unsure line or "as mom says" reads</td><td><code>lib/lineDisplay.ts</code> (<code>lineDisplay</code>, <code>keepButtonLabel</code>)</td></tr>
+  <tr><td>The note at the foot of the card</td><td><code>components/RecipeCard.tsx</code></td></tr>
+  <tr><td>Colors and fonts</td><td><code>app/globals.css</code></td></tr>
+  <tr><td>Photo size and camera handling</td><td><code>lib/photo.ts</code></td></tr>
+</table>
+
+<h2>A practice to reuse</h2>
+<details open>
+<summary>Let the AI read, and let a fixed table decide the numbers</summary>
+<p>Decision: Gemini only reports what mom said ("handful", how many); the app converts it. Evidence: <code>devpost/spec.md</code> (the fixed measuring table), <code>lib/measuringTable.ts</code>, and the checks in <code>tests/measuringTable.test.ts</code>, such as "two handfuls is half a cup". Because the number comes from a small table, it can be tested and changed without touching the AI. On another project, keep the model on interpretation and put anything that must be exact in plain, testable code.</p>
+</details>
+
+<h2>Run it again</h2>
+<ul>
+  <li>From the <code>product</code> folder: <code>npm install</code>, then <code>npm run dev</code>, then open <code>http://localhost:3000</code>. It needs <code>GEMINI_API_KEY</code> in <code>.env.local</code> (see <code>.env.example</code>).</li>
+  <li>Checks: <code>npm test</code>.</li>
+  <li>This page works offline and needs no scripts. Open the file directly in a browser.</li>
+</ul>
+</main>
+</body>
+</html>

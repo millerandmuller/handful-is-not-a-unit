@@ -297,7 +297,7 @@ const answer = JSON.parse(interaction.output_text);
 - Cut order if hours run short: saved recipe list, then photos on every ingredient, then ingredient pictures. Mom's words stay visible and every estimate stays labeled. This replaces the two-step order in `prd.md > Product Decisions`.
 
 **Agent's recommendations, agreed by the owner at review on 2026-10-05**
-- Gemini as the one AI service. The owner has both a Claude API account and a Gemini key. Gemini is recommended because it can also take audio, so the speech fallback needs no second service. Tradeoff: mom's words go to Google.
+- Gemini as the one AI service. Gemini is recommended because it can also take audio, so the speech fallback needs no second service. Tradeoff: mom's words go to Google.
 - The paid Gemini tier, for privacy.
 - Next.js and TypeScript as the way the app is built.
 - The fixed measuring table ("the AI reads, the app measures").
@@ -317,3 +317,4 @@ const answer = JSON.parse(interaction.output_text);
 - 2026-10-13: The demo video is recorded from the laptop. A laptop screen recording with listening on captured both the screen and the audio. On the iPhone, a Control Center recording with the microphone on lost its audio as soon as **Start listening** was tapped, because the microphone went to the app; the app kept capturing words. This replaces the iPhone or iPad recording plan in `Where It Runs and How Someone Tries It`.
 - 2026-10-13: A fifth line status, `as-moms-says`, was added to `Data Model`, and the `Leftover questions screen`, `Recipe card screen` and `Line display rule` components were changed to match the PRD revision of the same date: at **Finish** the daughter may keep an ingredient with no amount "as mom says" instead of picking an amount or removing it. No number is shown for such a line and it is never an estimate.
 - 2026-10-13: A line kept at **Finish** shows "as mom says" beside mom's words; with no words from mom it shows "no amount given". Refines the "as mom says" revision above; also in `checklist.md`.
+- 2026-10-14: Removed the sentence saying the owner holds both a Claude API account and a Gemini key from `Agent's recommendations`, at the owner's request. Wording only; the choice of Gemini and its reasons are unchanged.

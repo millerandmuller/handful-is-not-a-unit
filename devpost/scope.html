@@ -113,7 +113,7 @@
 <main>
   <div class="eyebrow">Scope · proof of concept</div>
   <h1>Handful Is Not a Unit</h1>
-  <p class="lede">An iPad on the kitchen counter listens while mom talks through a family recipe, and turns her "handfuls" and "about a scoop" into a recipe card her daughter can cook from later.</p>
+  <p class="lede">An iPhone or iPad on the kitchen counter listens while mom talks through a family recipe, and turns her "handfuls" and "about a scoop" into a recipe card her daughter can cook from later.</p>
   <span class="status">Status: approved · 2026-10-04</span>
 
   <h2>The unique kernel</h2>
@@ -125,7 +125,7 @@
   <figure class="card">
     <svg viewBox="0 0 760 300" role="img" aria-labelledby="dTitle dDesc">
       <title id="dTitle">From mom's words to a recipe card</title>
-      <desc id="dDesc">Mom speaks a rough amount. The iPad listens. The app estimates a measurement. The daughter confirms or corrects it. The amount lands on the recipe card, which someone later cooks from to get the same dish.</desc>
+      <desc id="dDesc">Mom speaks a rough amount. The iPhone or iPad listens. The app estimates a measurement. The daughter confirms or corrects it. The amount lands on the recipe card, which someone later cooks from to get the same dish.</desc>
       <defs>
         <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path class="head" d="M0 0 L10 5 L0 10 z"/>
@@ -137,8 +137,9 @@
       <text class="small" x="85" y="94" text-anchor="middle">"a handful of flour"</text>
 
       <rect class="box" x="205" y="40" width="150" height="80" rx="10"/>
-      <text class="label" x="280" y="72" text-anchor="middle">iPad listens</text>
-      <text class="small" x="280" y="94" text-anchor="middle">speech becomes text</text>
+      <text class="label" x="280" y="66" text-anchor="middle">iPhone or iPad</text>
+      <text class="small" x="280" y="86" text-anchor="middle">listens: speech</text>
+      <text class="small" x="280" y="104" text-anchor="middle">becomes text</text>
 
       <rect class="hot" x="400" y="40" width="150" height="80" rx="10"/>
       <text class="label" x="475" y="66" text-anchor="middle">App estimates</text>
@@ -173,13 +174,13 @@
   </figure>
 
   <h2>Who it's for</h2>
-  <p>A mom teaching her 10-year-old daughter a dish her own mother taught her. The daughter runs the app: she props her iPad on the counter while mom cooks and explains. Today the recipe lives only in mom's hands and memory, and it is passed on by watching.</p>
+  <p>A mom teaching her 10-year-old daughter a dish her own mother taught her. The daughter runs the app: she props her iPhone or iPad on the counter while mom cooks and explains. Today the recipe lives only in mom's hands and memory, and it is passed on by watching.</p>
 
   <h2>The core loop</h2>
   <ol class="loop">
-    <li>The daughter props the iPad on the counter and starts a recipe.</li>
+    <li>The daughter props the iPhone or iPad on the counter and starts a recipe.</li>
     <li>Mom cooks and explains what she is adding, in her own rough amounts.</li>
-    <li>The iPad listens. Each time mom says an amount, the app tracks it.</li>
+    <li>The iPhone or iPad listens. Each time mom says an amount, the app tracks it.</li>
     <li>The daughter sees it land and confirms ("great, okay").</li>
     <li>At the end there is a recipe card with the ingredients, the measurements, and the steps.</li>
   </ol>
@@ -196,7 +197,7 @@
   <details class="now" open>
     <summary>Now: in the proof of concept (6)</summary>
     <ul>
-      <li>One recipe, one cooking session, on one iPad.</li>
+      <li>One recipe, one cooking session, on one iPhone or iPad.</li>
       <li>The app listens to mom's speech and turns it into text.</li>
       <li>It pulls out ingredients, rough amounts, and steps.</li>
       <li>It turns each rough amount into a standard measurement, shown as an estimate next to mom's own words.</li>
@@ -218,7 +219,7 @@
     <ul>
       <li><strong>Live video measuring.</strong> <span class="reason">A camera cannot reliably tell how much is in a hand, and a confident wrong number would break the "cook it and get the same thing" test. It is also far beyond 2–4 hours of work.</span></li>
       <li><strong>Accounts and logins.</strong> <span class="reason">Not needed to prove the kernel.</span></li>
-      <li><strong>Multiple cooks or multiple devices.</strong> <span class="reason">One kitchen, one iPad.</span></li>
+      <li><strong>Multiple cooks or multiple devices.</strong> <span class="reason">One kitchen, one iPhone or iPad.</span></li>
     </ul>
   </details>
 
@@ -228,7 +229,12 @@
     <p style="margin-bottom:0"><strong>How a rough amount becomes a number:</strong> the app estimates a standard measurement from mom's words, labels it as an estimate, and lets the daughter correct it. An estimate from words alone will not guarantee the same dish; the correction step is what makes the card trustworthy.</p>
   </div>
 
-  <footer>Visual companion to <code>devpost/scope.md</code>, which remains the canonical document. Look and feel is not decided yet and is covered in the product requirements step.</footer>
+  <h2>Revisions</h2>
+  <div class="card">
+    <p style="margin:0"><strong>2026-10-13.</strong> Every "iPad" now reads "iPhone or iPad", at the owner's decision: the product runs in Safari on an iPhone or an iPad. Wording only; the scope and the kernel are unchanged.</p>
+  </div>
+
+  <footer>Visual companion to <code>devpost/scope.md</code>, which remains the canonical document. Look and feel is covered in <code>devpost/prd.md</code>.</footer>
 </main>
 </body>
 </html>

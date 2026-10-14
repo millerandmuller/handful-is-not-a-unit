@@ -63,7 +63,7 @@
 <main>
   <div class="eyebrow">Product requirements · proof of concept</div>
   <h1>Handful Is Not a Unit</h1>
-  <p class="lede">An iPad app that listens while mom talks through a family recipe and turns her rough amounts into a recipe card her 10-year-old daughter can cook from later.</p>
+  <p class="lede">An iPhone or iPad app that listens while mom talks through a family recipe and turns her rough amounts into a recipe card her 10-year-old daughter can cook from later.</p>
   <span class="status">Status: approved · 2026-10-04</span>
 
   <h2>The journey</h2>
@@ -113,7 +113,7 @@
       <text class="small" x="588" y="176">not answered: queued</text>
 
       <path class="arrow" d="M734 106 V235 H73 V108" stroke-dasharray="5 5" marker-end="url(#ah)"/>
-      <text class="small" x="200" y="228">saved on this iPad, appears in the list</text>
+      <text class="small" x="200" y="228">saved on this iPhone or iPad, appears in the list</text>
     </svg>
     </div>
     <figcaption>Highlighted: the listening session, where the idea is proven, and the card, which is the result.</figcaption>
@@ -130,7 +130,7 @@
 
   <section class="card panel">
     <h2>1 · Recipe list</h2>
-    <p>The recipes captured on this iPad, each shown by name, and a <strong>New</strong> button. Tapping a recipe opens its card.</p>
+    <p>The recipes captured on this iPhone or iPad, each shown by name, and a <strong>New</strong> button. Tapping a recipe opens its card.</p>
     <h3>If things are different</h3>
     <ul><li><strong>First use:</strong> the list is empty. The screen says so in a friendly way and points to New.</li></ul>
     <h3>How we know it works</h3>
@@ -153,7 +153,7 @@
 
   <section class="card panel">
     <h2>3 · Listening session</h2>
-    <p>A clear sign that the iPad is listening, the growing list of ingredient lines, any question the app is asking right now, and a way to finish.</p>
+    <p>A clear sign that the iPhone or iPad is listening, the growing list of ingredient lines, any question the app is asking right now, and a way to finish.</p>
     <div class="mock" aria-label="Example ingredient lines">
       <div class="line"><strong>Flour</strong> <span class="said">"a handful"</span> <span>about ¼ cup</span> <span class="tag">estimate</span></div>
       <div class="line"><strong>Eggs</strong> <span class="said">"two eggs"</span> <span>2</span></div>
@@ -196,6 +196,7 @@
       <li>Questions ignored during cooking are shown again.</li>
       <li>Estimates she neither confirmed nor changed are shown again.</li>
       <li>She can change any answer.</li>
+      <li>When mom cannot give an amount for an ingredient, she has three choices: pick an amount, remove the line, or keep it &quot;as mom says&quot;. A line kept that way stays on the card with the ingredient and mom's own words and no number, and it is not an estimate.</li>
     </ul>
     <h3>If things are different</h3>
     <ul><li><strong>Nothing captured:</strong> the app says there is nothing to make a card from and lets her keep listening or leave.</li></ul>
@@ -203,16 +204,17 @@
     <ul class="criteria">
       <li>A question ignored during cooking is shown again after finishing.</li>
       <li>An estimate that was never confirmed is shown again after finishing.</li>
+      <li>A question for an ingredient with no amount can be kept &quot;as mom says&quot;: the line stays on the card with mom's words and no number, and without an estimate mark.</li>
       <li>Skipping all photos still produces a complete card.</li>
     </ul>
   </section>
 
   <section class="card panel">
     <h2>5 · Recipe card</h2>
-    <p>The dish name, the finished meal image, every ingredient with its measurement, and the steps in order. Mom's original words stay visible next to each converted amount. At the foot of the card is a short note: &quot;The amounts on this card are estimates. Mom's own words are the real recipe. This card is not food-safety advice.&quot;</p>
+    <p>The dish name, the finished meal image, every ingredient with its measurement (or marked &quot;as mom says&quot;), and the steps in order. Mom's original words stay visible next to each converted amount. At the foot of the card is a short note: &quot;The amounts on this card are estimates. Mom's own words are the real recipe. This card is not food-safety advice.&quot;</p>
     <h3>How we know it works</h3>
     <ul class="criteria">
-      <li>Every ingredient on the card has a measurement.</li>
+      <li>Every ingredient on the card has a measurement or is marked &quot;as mom says&quot;.</li>
       <li>No line is still marked as an unreviewed estimate.</li>
       <li>The finished meal image appears at the top of the card.</li>
       <li>A person who was not in the kitchen can read it top to bottom and know what to add, how much, and what to do.</li>
@@ -271,12 +273,21 @@
   <details class="cut">
     <summary>Non-goals (4)</summary>
     <ul>
-      <li><strong>No accounts or logins.</strong> <span class="reason">One kitchen, one iPad.</span></li>
+      <li><strong>No accounts or logins.</strong> <span class="reason">One kitchen, one iPhone or iPad.</span></li>
       <li><strong>No measuring from video.</strong> <span class="reason">A confident wrong number would break the "cook it and get the same thing" test.</span></li>
       <li><strong>No recipe search, website import, or meal planning.</strong> <span class="reason">This captures one family's spoken recipes.</span></li>
       <li><strong>No nutrition or allergen information.</strong> <span class="reason">Outside the core idea.</span></li>
     </ul>
   </details>
+
+  <h2>Revisions</h2>
+  <div class="card">
+    <ul style="margin:0;padding-left:1.2em">
+      <li><strong>2026-10-13.</strong> Every "iPad" now reads "iPhone or iPad", at the owner's decision: the product runs in Safari on an iPhone or an iPad. Wording only; behavior and the proof-of-concept boundary are unchanged.</li>
+      <li><strong>2026-10-13.</strong> At <strong>Finish</strong>, a question for an ingredient mom cannot give an amount for gets a third choice besides picking an amount or removing the line: keep it &quot;as mom says&quot;. The line stays on the card with the ingredient and mom's own words and no number, and is not an estimate. &quot;Every ingredient on the card has a measurement&quot; became &quot;has a measurement or is marked as mom says&quot;. The card note is unchanged.</li>
+      <li><strong>2026-10-13.</strong> A line kept at <strong>Finish</strong> shows &quot;as mom says&quot; beside mom's words; with no words from mom it shows &quot;no amount given&quot;.</li>
+    </ul>
+  </div>
 
   <footer>Visual companion to <code>devpost/prd.md</code>, which remains the canonical document.</footer>
 </main>

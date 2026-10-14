@@ -4,7 +4,7 @@ An iPhone or iPad on the kitchen counter listens while mom talks through a famil
 
 Mom says "a handful of flour". The card shows flour, her own words in handwriting, and "about ¼ cup", marked as an estimate until someone confirms or corrects it.
 
-This is a proof of concept built for the Devpost hackathon "Build With AI: Basics". It is being built in steps; this README describes what works today.
+This is a proof of concept built for the Devpost hackathon "Build With AI: Basics". The proof of concept is complete; this README describes what works today.
 
 ## What works today
 

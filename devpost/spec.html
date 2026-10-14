@@ -83,13 +83,13 @@
     <div class="scroll">
     <svg viewBox="0 0 820 380" role="img" aria-labelledby="aT aD">
       <title id="aT">Architecture of Handful</title>
-      <desc id="aD">On the iPad: the ears turn mom's voice into text, the page sends the text to a helper on Vercel, the helper asks Gemini and returns ingredients, the page looks up the measuring table, shows a line, and saves finished recipes and photos in the recipe box on the iPad. The secret key lives only on Vercel.</desc>
+      <desc id="aD">On the iPhone or iPad: the ears turn mom's voice into text, the page sends the text to a helper on Vercel, the helper asks Gemini and returns ingredients, the page looks up the measuring table, shows a line, and saves finished recipes and photos in the recipe box on the iPhone or iPad. The secret key lives only on Vercel.</desc>
       <defs>
         <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker>
       </defs>
 
       <rect class="zone" x="8" y="20" width="470" height="350" rx="14"/>
-      <text class="zonelabel" x="22" y="42">ON THE IPAD (SAFARI)</text>
+      <text class="zonelabel" x="22" y="42">ON THE IPHONE OR IPAD (SAFARI)</text>
       <rect class="zone" x="500" y="20" width="150" height="350" rx="14"/>
       <text class="zonelabel" x="514" y="42">ON VERCEL</text>
       <rect class="zone" x="672" y="20" width="140" height="350" rx="14"/>
@@ -117,9 +117,10 @@
       <text class="small" x="251" y="327" text-anchor="middle">fixed, tested, no AI</text>
 
       <rect class="box" x="24" y="264" width="130" height="76" rx="10"/>
-      <text class="label" x="89" y="292" text-anchor="middle">Recipe box</text>
-      <text class="small" x="89" y="311" text-anchor="middle">recipes and photos</text>
-      <text class="small" x="89" y="327" text-anchor="middle">stay on this iPad</text>
+      <text class="label" x="89" y="284" text-anchor="middle">Recipe box</text>
+      <text class="small" x="89" y="302" text-anchor="middle">recipes and photos</text>
+      <text class="small" x="89" y="318" text-anchor="middle">stay on this</text>
+      <text class="small" x="89" y="334" text-anchor="middle">iPhone or iPad</text>
 
       <rect class="ext" x="512" y="150" width="126" height="76" rx="10"/>
       <text class="label" x="575" y="178" text-anchor="middle">The helper</text>
@@ -146,7 +147,7 @@
       <text class="small" x="575" y="274" text-anchor="middle">and nowhere else</text>
     </svg>
     </div>
-    <figcaption>Only text leaves the iPad for Google. Photos and finished recipes never leave the iPad. Orange boxes are the heart of the build.</figcaption>
+    <figcaption>Only text leaves the iPhone or iPad for Google. Photos and finished recipes never leave the iPhone or iPad. Orange boxes are the heart of the build.</figcaption>
   </figure>
 
   <h2>One sentence, step by step</h2>
@@ -158,43 +159,43 @@
 
   <section class="card step">
     <h2>1 · The daughter starts a recipe</h2>
-    <span class="where ipad">iPad</span>
+    <span class="where ipad">iPhone or iPad</span>
     <p>She opens the page, which reads the recipe box and shows saved recipes and <strong>New</strong>. She types the dish name and starts listening. Safari asks permission for the microphone the first time.</p>
     <h3>Files</h3><p><code>app/page.tsx</code> · <code>app/new/page.tsx</code> · <code>lib/recipeBox.ts</code></p>
     <h3>From the PRD</h3><p>Recipe list · Naming the recipe</p>
   </section>
   <section class="card step">
     <h2>2 · Mom says "a handful of flour"</h2>
-    <span class="where ipad">iPad</span>
-    <p>The iPad's built-in speech recognition turns her voice into text. If it stops by itself, it is restarted. If it cannot be used at all, the type-or-paste box does the same job.</p>
+    <span class="where ipad">iPhone or iPad</span>
+    <p>The iPhone or iPad's built-in speech recognition turns her voice into text. If it stops by itself, it is restarted. If it cannot be used at all, the type-or-paste box does the same job.</p>
     <h3>Files</h3><p><code>lib/ears.ts</code> · <code>components/ListeningSign.tsx</code> · <code>components/TypeOrPasteBox.tsx</code></p>
     <h3>From the PRD</h3><p>Listening and ingredient lines · States and Boundaries</p>
   </section>
   <section class="card step">
     <h2>3 · The text goes to the helper, and on to Gemini</h2>
-    <span class="where ipad">iPad</span><span class="where out">Vercel</span><span class="where out">Google</span>
+    <span class="where ipad">iPhone or iPad</span><span class="where out">Vercel</span><span class="where out">Google</span>
     <p>The page sends the new text and the names of ingredients already listed. The helper adds the instructions and the secret key and asks Gemini. Gemini answers in a fixed format: ingredient "flour", mom's words "a handful", kind "rough", rough word "handful", food group "grain".</p>
     <h3>Files</h3><p><code>lib/understandingClient.ts</code> · <code>app/api/understand/route.ts</code> · <code>lib/server/gemini.ts</code> · <code>lib/server/instructions.ts</code></p>
     <h3>From the PRD</h3><p>Listening and ingredient lines · Questions from the app</p>
   </section>
   <section class="card step">
     <h2>4 · The app measures</h2>
-    <span class="where ipad">iPad</span>
+    <span class="where ipad">iPhone or iPad</span>
     <p>The page looks "handful" up in the fixed table and gets ¼ cup. A line appears: flour, its picture, "a handful", "about ¼ cup", labeled estimate. A word the table does not know becomes a question.</p>
     <h3>Files</h3><p><code>lib/measuringTable.ts</code> · <code>lib/sessionRules.ts</code> · <code>lib/lineDisplay.ts</code> · <code>components/IngredientLine.tsx</code> · <code>components/IngredientPicture.tsx</code></p>
     <h3>From the PRD</h3><p>Listening and ingredient lines</p>
   </section>
   <section class="card step">
     <h2>5 · The daughter confirms, changes, or snaps</h2>
-    <span class="where ipad">iPad</span>
-    <p>One tap confirms. Tapping the amount shows a few smaller and larger amounts to pick from. The camera button opens the iPad camera and attaches the photo to the line.</p>
+    <span class="where ipad">iPhone or iPad</span>
+    <p>One tap confirms. Tapping the amount shows a few smaller and larger amounts to pick from. The camera button opens the iPhone or iPad camera and attaches the photo to the line.</p>
     <h3>Files</h3><p><code>components/AmountPicker.tsx</code> · <code>components/PhotoButton.tsx</code> · <code>lib/photo.ts</code> · <code>components/QuestionCard.tsx</code></p>
     <h3>From the PRD</h3><p>Confirming or changing an amount · Photos · Questions from the app</p>
   </section>
   <section class="card step">
     <h2>6 · Finish: leftovers, meal photo, card</h2>
-    <span class="where ipad">iPad</span>
-    <p>After <strong>Finish</strong>, the page walks through unanswered questions and unconfirmed estimates, asks for the finished meal photo, saves the recipe into the recipe box, and shows the card.</p>
+    <span class="where ipad">iPhone or iPad</span>
+    <p>After <strong>Finish</strong>, the page walks through unanswered questions and unconfirmed estimates, asks for the finished meal photo, saves the recipe into the recipe box, and shows the card. For an ingredient with no amount she can pick an amount, remove the line, or keep it &quot;as mom says&quot;: the line stays on the card with mom's words and no number, and is not an estimate.</p>
     <h3>Files</h3><p><code>app/session/page.tsx</code> · <code>app/recipe/[id]/page.tsx</code> · <code>components/RecipeCard.tsx</code> · <code>lib/recipeBox.ts</code></p>
     <h3>From the PRD</h3><p>Questions from the app · The recipe card · Recipe list</p>
   </section>
@@ -207,9 +208,9 @@
       <tr><td>Framework</td><td>Next.js</td><td>One project holds the page and the helper; Vercel hosts it without extra setup.</td></tr>
       <tr><td>Speech to text</td><td>Built into Safari</td><td>Your decision: no extra account or key.</td></tr>
       <tr><td>Understanding</td><td>Gemini, <code>gemini-3.8-flash</code></td><td>One service that reads text now and can take audio if the built-in ears fail.</td></tr>
-      <tr><td>Saving</td><td>Browser storage on the iPad</td><td>No accounts, no database, photos stay on the device.</td></tr>
+      <tr><td>Saving</td><td>Browser storage on the iPhone or iPad</td><td>No accounts, no database, photos stay on the device.</td></tr>
       <tr><td>Checks</td><td>Vitest</td><td>Tests the measuring table and the session rules automatically.</td></tr>
-      <tr><td>Hosting</td><td>Vercel</td><td>Your decision. Gives the secure address the iPad microphone requires.</td></tr>
+      <tr><td>Hosting</td><td>Vercel</td><td>Your decision. Gives the secure address the iPhone or iPad microphone requires.</td></tr>
     </table>
   </div>
 
@@ -245,14 +246,14 @@
     <p>A question, never a guess.</p>
   </details>
   <details>
-    <summary>Photos fill the iPad's storage</summary>
+    <summary>Photos fill the iPhone or iPad's storage</summary>
     <p>Photos are shrunk before saving. If one cannot be saved, the recipe is saved without it and the daughter is told.</p>
   </details>
 
   <h2>Agreed at review: the recommendations</h2>
   <div class="card ask">
     <ul>
-      <li><strong>Gemini as the one AI service.</strong> You have both a Claude API account and a Gemini key. Gemini can also take audio, so the speech fallback needs no second service. Tradeoff: mom's words go to Google.</li>
+      <li><strong>Gemini as the one AI service.</strong> Gemini is recommended because it can also take audio, so the speech fallback needs no second service. Tradeoff: mom's words go to Google.</li>
       <li><strong>The paid Gemini tier.</strong> On the free tier, what is sent may be used to improve Google's products. With a child in the kitchen, paid is the safer choice. A recipe should cost well under a dollar.</li>
       <li><strong>Next.js and TypeScript</strong> as the way the app is built.</li>
       <li><strong>The fixed measuring table.</strong></li>
@@ -262,6 +263,17 @@
 
   <h2>Open issue</h2>
   <div class="card">The Vercel address is public. Anyone who finds it could use the helper until the spending cap stops them. Vercel can require a Vercel sign-in to open the page, at no cost and with no code. This can wait until the first deploy.</div>
+
+  <h2>Revisions</h2>
+  <div class="card">
+    <ul style="margin:0;padding-left:1.2em">
+      <li><strong>2026-10-13.</strong> Every "iPad" now reads "iPhone or iPad", at the owner's decision: the product runs in Safari on an iPhone or an iPad. The design is unchanged.</li>
+      <li><strong>2026-10-13.</strong> The speech service fallback is not needed. On a laptop in Chrome and on an iPhone in Safari, all spoken ingredients appeared as lines and the listening sign did not drop out. Rough words became labeled estimates, and "just a little bit" became "needs an answer". The built-in speech recognition stays the only way of listening, with the typing box as the last resort.</li>
+      <li><strong>2026-10-13.</strong> The demo video is recorded from the laptop. A laptop screen recording with listening on captured both the screen and the audio. On the iPhone, a Control Center recording with the microphone on lost its audio as soon as <strong>Start listening</strong> was tapped, because the microphone went to the app.</li>
+      <li><strong>2026-10-13.</strong> A fifth line status, <code>as-moms-says</code>, was added: at <strong>Finish</strong> the daughter may keep an ingredient with no amount "as mom says". No number is shown for such a line and it is never an estimate. It shows "as mom says" beside mom's words, or "no amount given" when mom gave no words.</li>
+      <li><strong>2026-10-14.</strong> Removed the sentence about the owner holding both a Claude API account and a Gemini key from the recommendations. Wording only; the choice of Gemini and its reasons are unchanged.</li>
+    </ul>
+  </div>
 
   <footer>Visual companion to <code>devpost/spec.md</code>, which remains the canonical document and also holds the full file structure, data model and exact service calls.</footer>
 </main>
